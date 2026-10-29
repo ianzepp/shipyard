@@ -1,15 +1,15 @@
 ---
 name: polish
-description: Disciplined per-file improvement loop with a subtractive bias — correctness → cleanliness → housekeeping → tests → docs → commit. Use for polish, polish pass, polish loop, or polishing specific files.
+description: Disciplined per-file improvement loop with a subtractive bias — correctness → cleanliness → housekeeping → tests → docs → record. Use for polish, polish pass, polish loop, or polishing specific files.
 ---
 
 # Polish
 
 One primary source file per iteration. Supporting edits only when directly coupled: tests, fixtures, helpers, technical docs. Source comments and file-level documentation belong to the primary file, not the supporting-doc allowance. If work escapes this boundary → stop, report.
 
-**Polish runs on committed work only.** Run it after a [factory](../factory/SKILL.md) phase gate passes (see its [order](../factory/SKILL.md#order)), or on files the user names. Its commits contain only polish. If a target file has uncommitted changes that you did not make (the user or another process), stop and report; never fold them into a polish commit. In `user-commits` mode, run polish only after the user has committed the phase; polish then stages one file at a time and reports, and the user commits.
+**Polish runs on accepted work when no slice is in progress.** Run it after a [factory](../factory/SKILL.md) phase gate passes (see its [order](../factory/SKILL.md#order)), or on files the user names. Polish edits are kept separate from slice work: how they are recorded follows the [workflow](../factory/SKILL.md#workflow) (see Recording below). If a target file has changes that you did not make (the user or another process), stop and report; never fold them into a polish edit.
 
-**Git safety.** Never `reset --hard`, `checkout -- .`, `restore` over others' work, `clean`, `stash`, `rebase`, amend a landed commit, or force-push. Never discard changes you did not make. Fix forward with new commits.
+**Hard rule.** Never destroy or overwrite work you did not make. Never rewrite history that is accepted, integrated, or shared, and never force-push a shared branch. Fix forward.
 
 ## File list
 
@@ -31,7 +31,7 @@ One primary source file per iteration. Supporting edits only when directly coupl
 
 | # | Step | Gate |
 |---|---|---|
-| 0 | Confirm the file's changes are committed and none are foreign | Clean target; else stop and report |
+| 0 | Confirm the file's work is accepted, no slice is in progress, and no changes in it are foreign | Clean target; else stop and report |
 | 1 | Read file + nearby tests + related docs + surrounding context | Understand contract |
 | 2 | `correctness` → behavioral bugs, invariant breaks, race risks, data-loss risks | No silent regressions |
 | 3 | `cleanliness` lens applied to this one file → **subtractive first**: what can leave (dead code, redundant abstraction, fields/imports/helpers with no user)? Then naming, structure, complexity. No behavior change; aesthetic-only churn is not a reason to edit | Local maintainability ↑; every survivor defended |
@@ -40,11 +40,11 @@ One primary source file per iteration. Supporting edits only when directly coupl
 | 6 | Review source presentation under repository policy; update directly related technical docs | Charter/rationale/contract not stale or invented |
 | 7 | Targeted validation only: file + related tests | Short explicit timeout; no full suite |
 | 8 | Review diff for scope; keep only this unit's changes | No leak to other files |
-| 9 | Commit cohesive change (polish only) | Continue to next file |
+| 9 | Record the change per the workflow (polish only; see Recording) | Continue to next file |
 
-No useful change → record inspected, skip. No forced commit.
+No useful change → note it as inspected, skip. No forced change and no forced commit.
 
-**A bug found in step 2 is not a polish edit.** Stop work on that file, record the finding, and route it to [slicer](../slicer/SKILL.md#modes) rework mode (a) as a repair slice. When polish runs inside [factory](../factory/SKILL.md), factory runs that repair slice through sign-off and the phase gate (see its [phase gate](../factory/references/loop.md#phase-gate)); standalone, report the finding to the user. Polish commits stay polish-only; never mix a fix into one.
+**A bug found in step 2 is not a polish edit.** Polish pauses. First make the polish edits already finished durable (commit them per the workflow, or take a checkpoint when the agent does not commit), so the repair slice starts from that state. Then record the finding and route it to [slicer](../slicer/SKILL.md#modes) rework mode (a) as a repair slice in the same phase. When polish runs inside [factory](../factory/SKILL.md), factory reopens the phase gate (see its [phase gate](../factory/references/loop.md#phase-gate) for the reopen sequence), runs the repair slice through sign-off, and passes the gate again; polish resumes only after that. Standalone, report the finding to the user. Polish edits stay polish-only; never mix a fix into one.
 
 ## Design taste
 
@@ -97,9 +97,11 @@ or general-concept document remains outside the one-file boundary.
 | Timeout | Explicit short timeout via repo wrapper or shell tool | Hung suites |
 | Exception | Shared infrastructure where targeted checks give no signal → broaden, report why | Silent broadening |
 
-## Commit rule
+## Recording
 
-Commit after each changed primary file. Include: primary + supporting tests, fixtures, helpers, docs. In `user-commits` mode, stage the primary and supporting files for that one file, report, and let the user commit before moving to the next file.
+How polish edits are made durable follows the [workflow](../factory/SKILL.md#workflow).
+
+**In a committing workflow**, the recommendation is one commit per changed primary file, containing the primary file plus its supporting tests, fixtures, helpers, and docs. Stage only those files, and do not run git commands that take the repo lock in parallel. The workflow may group commits differently.
 
 | Element | Format |
 |---|---|
@@ -108,7 +110,9 @@ Commit after each changed primary file. Include: primary + supporting tests, fix
 | Primary trailer | `Polish-Primary: src/parser/nodes.rs` (exactly one) |
 | Supporting trailer | `Polish-Supporting: path/to/file` (optional) |
 
-Path-limited staging: stage only the primary file and its supporting files. Lock-producing git: serialize within the repo.
+The subject is a suggestion. The `Polish-Primary:` trailer is needed only for `suggest-polish-files.py` to rank candidates by churn since the last polish; without it, ranking falls back to `.polish-inspected.json`.
+
+**Otherwise** (the agent does not commit, or the workflow records work some other way), leave the edits in place for the user or the workflow to record, one primary file at a time, and report each file's changed paths with a suggested commit message. Record changed and inspected files in `.polish-inspected.json` (see below).
 
 ## Reporting candidates
 
@@ -119,7 +123,7 @@ python3 <skill-dir>/scripts/suggest-polish-files.py --repo <repo-root>
 python3 <skill-dir>/scripts/suggest-polish-files.py --repo <repo-root> --json --limit 15
 ```
 
-Recognized: `polish(scope):…`, legacy `Polish …`, reversed `<scope>: polish …`, any commit with `Polish-Primary:` trailer. Score = routing suggestion, not quality verdict.
+Recognized (committing workflows): `polish(scope):…`, legacy `Polish …`, reversed `<scope>: polish …`, any commit with `Polish-Primary:` trailer. Score = routing suggestion, not quality verdict.
 
 Exclude generated or unpolishable files with a repo-root `.polishignore` (gitignore-style globs, `#` comments, blank lines) or repeatable `--exclude <glob>` flags. Excluded files are dropped from candidates entirely and counted in the stderr summary.
 
@@ -142,7 +146,7 @@ Run the analyzer after a large merge to pick candidates, then polish them one fi
 
 ### Recording inspected files
 
-When a file is inspected through the full per-file loop and found clean (no changes needed, no commit), record it so the analyzer does not flag it again:
+Record every file the pass inspects, whether or not it changed: files found clean (no changes needed) so the analyzer does not flag them again, and, in a workflow that does not commit, files changed. Record them at the end of the pass:
 
 ```bash
 python3 <skill-dir>/scripts/polish-inspected.py \
@@ -161,18 +165,18 @@ python3 <skill-dir>/scripts/polish-inspected.py --repo <repo-root> --prune
 python3 <skill-dir>/scripts/polish-inspected.py --repo <repo-root> --list
 ```
 
-Whoever runs the pass **must** record every file it inspects and finds clean during a polish pass. `.polish-inspected.json` is a polish artifact, so it stays within the polish-only rule. Commit it with the pass's last polish commit; when the pass makes no other polish commit, commit it alone as `polish: record inspected files` (no `Polish-Primary:` trailer). In `user-commits` mode, stage it and report.
+Whoever runs the pass **must** record its inspected files this way. `.polish-inspected.json` is a bookkeeping file: it is excluded from slice scope checks and from clean-tree checks, and is recorded however the workflow records work. In a committing workflow, one option is to include it with the pass's last polish commit, or commit it alone (for example `polish: record inspected files`, with no `Polish-Primary:` trailer) when the pass makes no other polish commit. In a workflow where the agent does not commit, an inspected timestamp can go stale after the user commits the file; the analyzer then suggests that file again, which is harmless.
 
 ## Progress reporting
 
 | When | Report |
 |---|---|
-| After each file | Primary file completed; supporting files changed; validation: ran/deferred/broadened with reason; commit hash+subject or skip reason; boundary issues |
-| End of cycle | Run broader validation once; summarize: completed files, inspected-unchanged, skipped, validation coverage, all commits |
+| After each file | Primary file completed; supporting files changed; validation: ran/deferred/broadened with reason; commit hash+subject (or changed paths when nothing is committed) or skip reason; boundary issues |
+| End of cycle | Run broader validation once; summarize: completed files, inspected-unchanged, skipped, validation coverage, all commits or changed paths |
 
 ## Anti-patterns
 
-**Loop:** skip correctness for cleanliness, defer tests past commit, run full suite per file, force commit on unchanged file, polish files outside the bounded list, scope leak to unrelated files, silent test broadening, delete code whose load-bearing purpose is unconfirmed.
+**Loop:** skip correctness for cleanliness, defer tests past the file's record, run full suite per file, force commit on unchanged file, polish files outside the bounded list, scope leak to unrelated files, silent test broadening, delete code whose load-bearing purpose is unconfirmed.
 **Source presentation:** narrate code, demand comments for every survivor, invent rationale or history, copy changing inventories into prose, rewrite cross-module charters inside one file's loop.
-**Commit:** omit `Polish-Primary:` trailer on a primary-file commit, fold a bug fix into a polish commit, `polish` type on non-polish commits, parallel git during file loop, mixed-scope commits spanning multiple primary files.
+**Recording:** fold a bug fix into a polish edit, `polish` type on non-polish commits, parallel git during file loop, leaving a primary-file commit without a `Polish-Primary:` trailer when you want the analyzer to rank it, mixed-scope commits spanning multiple primary files (when the workflow allows separate commits), polishing while a slice is in progress.
 **Reporting:** skip per-file progress, treat `suggest-polish-files.py` score as quality gate.

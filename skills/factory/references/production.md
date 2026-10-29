@@ -6,7 +6,7 @@ execution-ready goal boundary.
 Production turns a roadmap, milestone list, campaign stage list, or epic set into
 phase candidates: phase-sized outcomes, each compiled into one delivery spec
 and run as one factory phase. It does not compile implementation work; that belongs to
-[$delivery](../../delivery/SKILL.md). It does not execute; that belongs to [loop](loop.md).
+[delivery](../../delivery/SKILL.md). It does not execute; that belongs to [loop](loop.md).
 
 ## Purpose
 
@@ -21,7 +21,7 @@ What is the next phase candidate factory should compile and execute?
 - vision readiness record
 - roadmap docs, milestones, campaign stages, epics, issue sets, or prior plans
 - repo ownership boundaries and current worktree state
-- existing delivery specs and completed commits
+- existing delivery specs and accepted work
 - deferred findings from prior phases
 
 ## Ledger

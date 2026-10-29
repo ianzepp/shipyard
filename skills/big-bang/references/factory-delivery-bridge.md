@@ -118,7 +118,7 @@ Delivery Spec Directory:
 
 Checkpoint Policy:
 
-Commit Unit (per-slice by default):
+Workflow (how changes are isolated, made durable, integrated):
 
 Agent Policy:
 
@@ -153,7 +153,7 @@ Promote from Big Bang to factory when:
 
 - the user wants autonomous multi-phase execution
 - the phase list is durable enough to survive compaction
-- checkpoints are clear and the commit unit is chosen (per-slice by default; see factory [Commits](../../factory/SKILL.md#commits))
+- checkpoints are clear and the workflow is chosen or left for factory intake (see factory [Workflow](../../factory/SKILL.md#workflow))
 - the work is no longer primarily about discovering the idea
 
 Stay in Big Bang when:

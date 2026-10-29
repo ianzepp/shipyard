@@ -395,7 +395,7 @@ For read-only cleanliness reviews, use concise findings:
 phase-blocking: `src/api/auth/routes.rs::register` mixes request parsing,
 tenant creation, key provisioning, and response shaping in one 180-line handler.
 The current phase adds new auth behavior here, so split provisioning into a
-domain helper before committing.
+domain helper before the phase gate.
 
 deferred: `src/service.rs` is a 600-line facade. The touched method stayed thin,
 so this is not phase-blocking. Consider grouping methods by route family in a

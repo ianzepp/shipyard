@@ -31,7 +31,7 @@ Do not use it when:
 - Step order matters. Do not skip ahead to writing tests before the coverage and decomposition audits are done.
 - When delegation is available, use independent passes rather than treating the first draft of tests as final.
 - Do not declare success on added tests that were never executed.
-- Inside factory, authored tests and testability refactors run as slices: they feed [$slicer](../../slicer/SKILL.md) and land through [slice sign-off](loop.md#running-a-slice-list), where they are run (red-first for new behavior or a bug fix). The standalone rule "do not run tests during Wave 1 or Wave 2" does not apply inside factory.
+- Inside factory, authored tests and testability refactors run as slices: they feed [$slicer](../../slicer/SKILL.md) and are accepted through [slice sign-off](loop.md#running-a-slice-list), where they are run (red-first for new behavior or a bug fix). The standalone rule "do not run tests during Wave 1 or Wave 2" does not apply inside factory.
 - Preserve the baseline. Separate ambient failures from failures introduced by the testing effort.
 
 ## Entry Conditions

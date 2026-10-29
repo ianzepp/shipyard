@@ -38,7 +38,7 @@ Choose one before the audit:
 
 - Complete coverage and decomposition audits before writing tests.
 - When delegation is available: Wave 1 authors tests; Wave 2 verifies; they must not be the same agent for the same surface.
-- Standalone: do not run tests during Wave 1 or Wave 2. Inside factory the waves still decide who authors and who verifies, but the authored tests land as slices and are run at sign-off (see Inside Factory).
+- Standalone: do not run tests during Wave 1 or Wave 2. Inside factory the waves still decide who authors and who verifies, but the authored tests become slices, accepted per the [workflow](../factory/SKILL.md#workflow), and are run at sign-off (see Inside Factory).
 - Red first: for new behavior or a bug fix, run the new test before the fix and record that it fails for the right reason (the missing behavior or the bug, not a typo or broken setup). A test never seen failing proves nothing. Inside factory this is the slice brief's `red_first: yes` field (see Inside Factory).
 - Without delegation, Wave 2 is a self-contained cold pass: re-read the Wave 1 tests against the implementation contract only, not your authoring notes, and report `Evaluator mode: self-contained cold pass`.
 - Keep agent ownership boundaries explicit so parallel workers do not collide in the same files.
@@ -51,8 +51,8 @@ Choose one before the audit:
 
 Red-green inside [factory](../factory/SKILL.md) produces or feeds slices (see [red-green-mode](../factory/references/red-green-mode.md)):
 
-- Authored tests and any testability refactors run as slices through [slice sign-off](../factory/references/loop.md#running-a-slice-list), not as ad-hoc edits.
-- Tests are run at sign-off, never left unexecuted. For a slice whose brief says `red_first: yes`, the runner writes the test, runs it, confirms it fails for the stated reason, records a summary of the failing output in the [ledger](../factory/references/loop.md#ledger-file), and only then lets the implementation change land. Sign-off checks that record.
+- Authored tests and any testability refactors run as slices (accepted per the [workflow](../factory/SKILL.md#workflow)) through [slice sign-off](../factory/references/loop.md#running-a-slice-list), not as ad-hoc edits.
+- Tests are run at sign-off, never left unexecuted. For a slice whose brief says `red_first: yes`, the runner writes the test, runs it, confirms it fails for the stated reason, records a summary of the failing output in the [ledger](../factory/references/loop.md#ledger-file), and only then lets the implementation change proceed. Sign-off checks that record. When the slice creates a brand-new module, stub the interface first so the test fails on behavior, not on a missing import.
 - Run the narrowest scope that proves the slice; widen at the phase gate and checkpoints, not per slice.
 - Wave 2 without delegation is the same self-contained cold pass, with the `Evaluator mode` line above.
 

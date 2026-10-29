@@ -7,9 +7,9 @@ description: Turn one bounded but messy unit of work into a durable, repo-aware 
 
 Delivery compiles one coherent outcome into a specification that `factory` can
 execute. It inspects and plans, but does not implement, verify product behavior,
-commit product changes, or run the factory lifecycle. It commits only its own
-spec artifact, as `docs(plan): <name>`, following the user's commit unit (see
-factory [Commits](../factory/SKILL.md#commits)).
+change product code, or run the factory lifecycle. It writes only its own spec
+artifact and leaves it in place. Factory intake records it per the workflow
+(see factory [Workflow](../factory/SKILL.md#workflow)).
 
 Use `campaign` first when several tracks need one routing contract. Skip
 delivery when the work is already implementation-ready and the user wants a
@@ -82,8 +82,10 @@ authority changes need an explicit serialization or integration plan.
 ## Artifact
 
 Save the result before implementation. Use the repo's own plans or docs
-convention; by default `docs/plans/<name>.md`. Record the path used. Ask only
-when destination choice would be material.
+convention. By default, for a goal, write `docs/goals/<goal-name>/phase-<n>.md`
+next to its `GOAL.md` (one spec per phase). For a standalone unit with no goal,
+pick a short kebab-case name and use `docs/goals/<name>/phase-1.md`. Record the
+path used. Ask only when destination choice would be material.
 
 Include:
 
@@ -131,9 +133,7 @@ and validation honestly proves the intended outcome.
 
 Units stay at the logical-change level. The next step is
 [`slicer`](../slicer/SKILL.md): it cuts each unit into small self-contained
-slices against the current code, just before implementation. Commits follow
-the user's commit unit (per slice by default); see factory
-[Commits](../factory/SKILL.md#commits).
+slices against the current code, just before implementation.
 
 Finish with a short response pointing to the saved artifact and naming only
 blocking open questions. Do not paste the full specification into chat.

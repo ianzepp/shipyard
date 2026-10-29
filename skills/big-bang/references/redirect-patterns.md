@@ -163,7 +163,7 @@ Prompt shape:
 
 ```text
 This is now a phase set. Prepare the factory handoff, then run it phase by phase
-with delivery specs, checkpoint gates, and commits.
+with delivery specs, checkpoint gates, and a settled workflow.
 ```
 
 ## Branch Ledger Template

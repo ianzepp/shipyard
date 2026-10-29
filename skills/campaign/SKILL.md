@@ -30,13 +30,13 @@ repository rules, or user reserves an approval gate. Production changes,
 deployments, payments, credential use, destructive data changes, and outbound
 effects still require their stated authority.
 
-State lives in files. The default campaign artifact is `CAMPAIGN.md` (or
-`<name>.campaign.md`) at the repo root or the repo's docs directory; a repo's
-own convention wins. Record the path used.
-Commit the artifact when it is written or approved, as `docs(plan): <name>`,
-following the user's commit unit (see factory
-[Commits](../factory/SKILL.md#commits)). Factory keeps one ledger for the run
-beside it (`<campaign-stem>.ledger.md`).
+State lives in files. Pick a short kebab-case `<campaign-name>`; the default
+campaign artifact is `docs/campaigns/<campaign-name>/CAMPAIGN.md`, and a
+repo's own convention wins. Record the path used.
+Write the artifact and leave it in place. Factory intake records it per the
+workflow (see factory [Workflow](../factory/SKILL.md#workflow)). When factory
+runs the campaign it keeps one ledger beside it
+(`docs/campaigns/<campaign-name>/ledger.md`).
 
 ## Ground Truth
 
@@ -105,9 +105,7 @@ embed factory tasks in the top-level artifact.
    named task-specific process.
 8. Validate the stage with the strongest honest stage-scoped evidence.
 9. Update the campaign and the owning goal's `## Status` section immediately
-   with evidence, routing changes, blocked work, and the next stage. These
-   status edits are bookkeeping: commit them with the stage's work or as
-   `chore(ledger): <event>` under the user's commit unit.
+   with evidence, routing changes, blocked work, and the next stage.
 10. Continue while the next stage is clear, safe, and authorized.
 
 Research and documentation campaigns may produce artifacts and run gates
@@ -124,7 +122,8 @@ Do not call the campaign complete because the artifact is coherent, a next
 stage is named, a delivery spec exists, or partial tests pass. Complete only
 when every admitted item is implemented and verified and the desired end state
 and closeout gates are achieved, or the user explicitly amends the contract.
-An audit is due at campaign completion (see factory
+Completion follows factory [Closeout](../factory/SKILL.md#closeout): the audit
+due at campaign completion is resolved (see factory
 [After Audit](../factory/SKILL.md#after-audit)), and any open
 independent-review item blocks closeout unless the user accepts it by name,
 recorded in the ledger.

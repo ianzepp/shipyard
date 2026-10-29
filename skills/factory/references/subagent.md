@@ -1,6 +1,6 @@
 # Subagent
 
-Use this reference only for the parts of Factory execution that are specifically about using subagents. Factory already owns phase lifecycle, delivery specs, verification, gates, commits, correctness passes, and resumability.
+Use this reference only for the parts of Factory execution that are specifically about using subagents. Factory already owns phase lifecycle, delivery specs, verification, gates, recording accepted work, correctness passes, and resumability.
 
 ## Core Principle
 
@@ -67,7 +67,7 @@ Required constraints:
 - provide the relevant test or verification command
 - when the brief says `red_first: yes`, require the new test to be run and seen failing before the change, with a summary of the failing output in the report (see [Running a Slice List](loop.md#running-a-slice-list))
 - forbid unrelated cleanup
-- forbid commits; the parent commits path-limited after sign-off
+- forbid recording changes (commits, merges) unless the workflow gives the implementer its own slice branch; the parent accepts the slice per the workflow after sign-off ([factory's Workflow](../SKILL.md#workflow))
 - require a concise summary of changed files and verification performed
 
 ### Investigator
@@ -142,7 +142,7 @@ Safe parallelism:
 Unsafe parallelism:
 
 - multiple implementers editing the same files
-- parallel git index mutations or commits
+- parallel git index mutations or commits in one working tree
 - concurrent formatters over shared trees
 - one worker changing APIs while another builds on the old shape
 - workers that depend on each other's unmerged results
@@ -153,12 +153,12 @@ When in doubt, serialize implementers and parallelize reviewers.
 
 Subagent summaries are claims, not proof.
 
-The parent Factory run should verify important outcomes before advancing gates or committing:
+The parent Factory run should verify important outcomes before advancing gates or accepting work:
 
 - inspect the actual diff or files when the change matters
 - run or review the named verification commands
 - confirm generated artifacts exist at the expected paths
-- confirm the subagent made no commits
+- confirm the subagent recorded nothing the workflow does not let it record
 - re-run failed or ambiguous checks in the parent context when necessary
 
 A reviewer subagent can inform a gate, but the parent owns the gate decision.
@@ -214,6 +214,6 @@ Do not put Factory lifecycle rules here. The following belong in Factory's main 
 - correctness mode
 - red-green mode
 - polish closeout policy
-- commit unit and bookkeeping commits
+- the workflow contract and bookkeeping files
 - compaction recovery
 - final Factory reporting

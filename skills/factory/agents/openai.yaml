@@ -1,4 +1,4 @@
 interface:
   display_name: "Factory"
-  short_description: "Run goal-to-commit factory loops with planning, verification, and commits"
-  default_prompt: "Use $factory to execute a grounded multi-phase goal through scoped delivery, implementation, verification, review, status updates, coherent commits, and release decisions."
+  short_description: "Run goal-to-closeout factory loops with planning, verification, and review"
+  default_prompt: "Use $factory to execute a grounded multi-phase goal through scoped delivery, implementation, verification, review, status updates, changes recorded per the repo's workflow, and release decisions."

@@ -6,18 +6,21 @@ description: "Full repository maintenance cycle at major inflection points: mech
 # Housekeeping
 
 Full maintenance cycle for **major inflection points**. Run steps in order.
-Commit after each successful step that changes the tree. Stop and ask the user
-if a failure is ambiguous or a fix needs product judgment.
+Its git steps follow the [workflow](../factory/SKILL.md#workflow): in a
+committing workflow, the recommendation is to commit after each successful step
+that changes the tree (the commit subjects below, such as `style:` and `chore:`,
+are suggestions too); otherwise leave the changes in place and report them. Stop and ask the user if
+a failure is ambiguous or a fix needs product judgment.
 
 | Related | Relationship |
 |---|---|
-| When to run | Run only **between** [factory](../factory/SKILL.md) phases or at goal/campaign closeout (see its [order](../factory/SKILL.md#order)), on a **clean tree** (factory commits its [bookkeeping files](../factory/SKILL.md#commits) as it goes, so the tree is clean between phases), where its pull and its own commits are safe. Other major inflection points: large merge spanning several features, stage closeout, user ask. Not after every change — cost is about that of a large implementation unit. Inside a factory phase, structural cleanup is a tidy slice there, not housekeeping. Prefer **one step per run** when possible. A mechanical-only pass is Step 1. |
+| When to run | Run only **between** [factory](../factory/SKILL.md) phases or at goal/campaign closeout (see its [order](../factory/SKILL.md#order)), when **no slice is in progress**, on a **clean tree** (the clean-tree check excludes the run's bookkeeping files: goal, campaign, spec, slice file, ledger, audit report, `.polish-inspected.json`). At goal closeout it runs **before the goal-completion audit** so the audit covers it (see [closeout](../factory/SKILL.md#closeout)). Other major inflection points: large merge spanning several features, stage closeout, user ask. Not after every change — cost is about that of a large implementation unit. Inside a factory phase, structural cleanup is a tidy slice there, not housekeeping. Prefer **one step per run** when possible. A mechanical-only pass is Step 1. |
 | `$polish` | Deeper per-file quality (test decomposition, missing tests, docs) is `$polish`, not this skill. Housekeeping enforces test **boundaries**; polish improves test **quality**. |
 | Docs | README / documentation truth passes are their own tasks, not steps here. Verify doc claims against live code. |
 
 Dependency and lockfile policy: [dependency-policy](references/dependency-policy.md).
 
-**Git safety.** Never `reset --hard`, `checkout -- .`, `restore` over others' work, `clean`, `stash`, `rebase`, amend a landed commit, or force-push. Never discard changes you did not make. Fix forward with new commits. (Step 1 refresh below uses `pull --ff-only` only; it never merges or rebases.)
+**Hard rule.** Never destroy or overwrite work you did not make. Never rewrite history that is accepted, integrated, or shared, and never force-push a shared branch. Fix forward. (The Step 1 refresh below uses `pull --ff-only` only, and only when the workflow tracks an upstream and the user wants it; it never merges or rebases.)
 
 ## Pipeline Order
 
@@ -41,7 +44,7 @@ or ratchet over unmigrated inline tests in such a repo.
 
 ## Step Summary
 
-| # | Step | Action | Commit |
+| # | Step | Action | Suggested commit (committing workflows) |
 |---|---|---|---|
 | **1** | Mechanical block | 1.1 Refresh → 1.2 Orient → 1.3 Verify env → 1.4 Lint `--fix` → 1.5 Build → 1.6 Format → 1.7 Generated → 1.8 Report | `style: format` / `chore: lint --fix` / `chore: regenerate` |
 | **2** | Test boundary hygiene | When the repo's convention is separate test files (or the user asks): extract inline tests to dedicated test files; verify thin wiring only | `test: extract inline tests to dedicated files` |
@@ -80,18 +83,18 @@ costly.
 | Field | Required |
 |---|---|
 | **Repo root** | Exact path (monorepo: one package or sibling repo, not the whole container unless asked) |
-| **Allowed paths** | Exact paths or "whole clean repo" |
+| **Allowed paths** | Exact paths or "whole clean repo". Inside a [factory](../factory/SKILL.md) run, the default is the paths the goal changed, unless the user asks for more |
 | **Generators** | Optional explicit script path |
 
-Outside freeze → inventory and **stop** (uncommitted changes you did not make: never erase them).
+Outside freeze → inventory and **stop** (changes you did not make: never erase them).
 
 There is **no** test-filter field. Do not accept or invent one.
 
 ### Mechanical steps
 
-| # | Step | Action | Commit |
+| # | Step | Action | Suggested commit (committing workflows) |
 |---|---|---|---|
-| 1.1 | Refresh | Status + optional ff-only pull | — |
+| 1.1 | Refresh | Status + ff-only pull when the workflow tracks an upstream and the user wants it | — |
 | 1.2 | Orient | Toolchain + HEAD | — |
 | 1.3 | Verify env | Build/check **commands** only (not tests) | — |
 | 1.4 | Lint auto | Repo linter `--fix` only | `chore: lint --fix` if tree changed |
@@ -108,9 +111,9 @@ There is **no** test-filter field. Do not accept or invent one.
 |---|---|---|---|
 | 1 | Worktree | `git rev-parse --show-toplevel` | Exists; matches task root |
 | 2 | Status | `git status --short --branch` | — |
-| 3 | Dirty outside freeze | List paths; **stop** | User decision |
-| 4 | Dirty inside freeze only | Housekeeping runs on a clean tree: stop unless the user says that dirt is theirs and in scope | User decision |
-| 5 | Clean + upstream | `git fetch` → `git pull --ff-only` | Fast-forward OK |
+| 3 | Dirty outside freeze (bookkeeping files excluded) | List paths; **stop** | User decision |
+| 4 | Dirty inside freeze only (bookkeeping files excluded) | Housekeeping runs on a [clean tree](../factory/SKILL.md#workflow) (in a checkpoint workflow: no changes since the latest accepted checkpoint): stop unless the user says that dirt is theirs and in scope | User decision |
+| 5 | Clean + upstream | Only when the workflow tracks an upstream and the user wants it: `git fetch` → `git pull --ff-only`. Otherwise skip and record why | Fast-forward OK |
 | 6 | Diverged / pull fails | **Stop**, report | — |
 | 7 | Record | `git log --oneline -1` | HEAD captured |
 
@@ -156,8 +159,8 @@ Run (existing tools only):
 | Python | `ruff check --fix .` if present |
 
 If no linter configured → **skip** (do not bootstrap).
-If auto-fix rewrites files → inspect diff → commit `chore: lint --fix` only if
-purely mechanical.
+If auto-fix rewrites files → inspect diff → keep (and, in a committing
+workflow, for example as `chore: lint --fix`) only if purely mechanical.
 
 **Never:** add eslint/prettier/ruff config; "fix remaining warnings" by redesign.
 
@@ -182,7 +185,7 @@ Green → continue. Red → Tiny Fix Rule or stop + report.
 | Python | `ruff format` if present |
 
 Inspect formatter diff. Huge unrelated churn → **stop**, do not commit.
-Else commit `style: format` when files changed.
+Else, in a committing workflow, commit it (for example `style: format`) when files changed.
 
 ### 1.7 Generated Outputs
 
@@ -210,7 +213,7 @@ Otherwise: **stop**, report the residual to the user.
 |---|---|
 | Scope | Repo, freeze, HEAD before/after |
 | Commands | Exact commands + pass/fail |
-| Commits | Count + short hash + subject each |
+| Commits | Count + short hash + subject each; or, when the workflow does not commit, the changed paths left in the tree |
 | Files | Touched paths |
 | Residuals | Failures, out-of-scope dirt, judgment needed |
 | Not claimed | Product correctness, **any test results**, full suite, public claim truth |
@@ -226,7 +229,7 @@ Freeze: paths | whole clean repo
 Commands (optional overrides): fmt / lint / build-or-check / generator
 Done when: format + lint --fix + build/check green, or fail report with logs
 Never: tests
-Commit: style:/chore: only on allowed paths
+Commit (suggested, committing workflows): style:/chore: only on allowed paths
 ```
 
 ## Step 2: Test Boundary Hygiene
@@ -252,14 +255,14 @@ count before == test count after.
 Per-language detection commands: see
 [test-boundary-hygiene](references/test-boundary-hygiene.md).
 
-Commit: `test: extract inline tests to dedicated files`.
+Suggested commit (committing workflows): `test: extract inline tests to dedicated files`.
 
 ## Step 3: Banned-Pattern Ratchet
 
 | State | Sequence |
 |---|---|
-| **No ratchet** | (1) Where Step 2 applies, test boundary hygiene must be complete → (2) Set each budget to current production-only totals (not arbitrary zero) → (3) Scope scans to production files; exclude dedicated test filenames → (4) Include the required structural inline-test check → (5) Run the new hygiene test → (6) Commit: `test: add hygiene ratchet` |
-| **Ratchet exists** | (1) Run → (2) If Step 2 applies and tests are in production files → back to Step 2, re-run → (3) Reduce production violations; never raise budget → (4) Lower the budget constant when code beats it → (5) Commit: `chore: reduce hygiene debt` or `test: extract inline tests to dedicated files` |
+| **No ratchet** | (1) Where Step 2 applies, test boundary hygiene must be complete → (2) Set each budget to current production-only totals (not arbitrary zero) → (3) Scope scans to production files; exclude dedicated test filenames → (4) Include the required structural inline-test check → (5) Run the new hygiene test → (6) Commit, in a committing workflow (suggested): `test: add hygiene ratchet` |
+| **Ratchet exists** | (1) Run → (2) If Step 2 applies and tests are in production files → back to Step 2, re-run → (3) Reduce production violations; never raise budget → (4) Lower the budget constant when code beats it → (5) Commit, in a committing workflow (suggested): `chore: reduce hygiene debt` or `test: extract inline tests to dedicated files` |
 
 Use bundled references: Rust: [hygiene-rs](references/hygiene-rs.md), TS/JS:
 [hygiene-ts](references/hygiene-ts.md), Go: [hygiene-go](references/hygiene-go.md),
@@ -274,9 +277,9 @@ Skip when there is no practical test harness or the language is unsupported.
 
 | Category | Content |
 |---|---|
-| Mechanical | 1.8 report summary (commands, style/chore commits, pass/fail) |
+| Mechanical | 1.8 report summary (commands, style/chore commits, when committing, pass/fail) |
 | Hygiene | Test boundary: inline tests extracted; structural ratchet status. Ratchet: budget before→after |
-| Commits | Count + short hashes |
+| Commits | Count + short hashes, or the changed paths when nothing was committed |
 | Build + tests | Final status (tests: which narrow suites ran) |
 | Changes | By category: lint, correctness, tests, formatting, docs |
 | Dependencies | Cooldown/lock notes; advisories |
@@ -284,7 +287,7 @@ Skip when there is no practical test harness or the language is unsupported.
 
 ## Anti-Patterns
 
-**Workspace:** stashing uncommitted changes you did not make; merging/rebasing through divergence;
+**Workspace:** stashing changes you did not make; merging/rebasing through divergence;
 skipping the 1.1 refresh before judgment edits; raising hygiene budgets;
 deleting tests instead of extracting them.
 

@@ -26,7 +26,7 @@ Global rules:
 
 ## Mode Selection
 
-Inside factory, this is normally an update-and-fix mode because the phase is already in execution. Its fixes run as slices: the analysis feeds [$slicer](../../slicer/SKILL.md) (or rework mode (a) for findings in an existing cut), and each fix lands through [slice sign-off](loop.md#running-a-slice-list), with `red_first: yes` for each bug fix. Do not make ad-hoc edits outside a slice. When the user clearly wants read-only diagnosis first, find the cause read-only before entering implementation.
+Inside factory, this is normally an update-and-fix mode because the phase is already in execution. Its fixes run as slices: the analysis feeds [$slicer](../../slicer/SKILL.md) (or rework mode (a) for findings in an existing cut), and each fix is accepted through [slice sign-off](loop.md#running-a-slice-list), with `red_first: yes` for each bug fix. Do not make ad-hoc edits outside a slice. When the user clearly wants read-only diagnosis first, find the cause read-only before entering implementation.
 
 This update mode is for correctness-mode phases only. The correctness read at slice sign-off stays read-only.
 

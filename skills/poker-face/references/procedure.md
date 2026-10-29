@@ -6,7 +6,7 @@ Detailed audit mechanics. The skill's `SKILL.md` owns gate rules, factory placem
 
 Reread the original target material before reading the implementer's completion summary.
 
-Write a short summary of what "done" means for this work. Use the delivery spec or checkpoint target when available. The target must be concrete enough that a second reader can compare it against the diff.
+Write a short summary of what "done" means for this work. Use the delivery spec or checkpoint target when available. In a repair phase, the target is the audit findings' done-when. The target must be concrete enough that a second reader can compare it against the diff.
 
 ## 2. Build The Requirement Checklist
 
@@ -29,7 +29,7 @@ For each checklist item, inspect actual repository state.
 Use direct reads and commands where practical:
 
 - read the plan, delivery spec, and affected files
-- inspect `git status` and the relevant diff or commits
+- inspect `git status` and the phase change set
 - run or review validation evidence
 - search for named APIs, routes, flags, files, tests, fixtures, docs, migrations, and examples
 - verify generated artifacts or runtime behavior when the requirement depends on them
@@ -42,7 +42,7 @@ Poker-face is mandatory at the phase gate when a goal, spec, or acceptance crite
 
 Use an independent evaluator agent when your tool supports subagents.
 
-With no subagent, run a self-contained cold pass instead: write the requirement checklist from the plan and acceptance criteria before reading any summary, ledger, or commit message, then inspect the committed range against it. Report:
+With no subagent, run a self-contained cold pass instead: write the requirement checklist from the plan and acceptance criteria before reading any summary, ledger, or commit message, then inspect the phase change set (from the phase base, as the [workflow](../../factory/SKILL.md#workflow) provides it) against it. Report:
 
 - `Evaluator mode: self-contained cold pass`
 - why no subagent was used
@@ -62,7 +62,7 @@ The evaluator acts like a fresh session given the original plan and asked whethe
 
 1. Provide the original plan, delivery spec, checkpoint target, and acceptance criteria.
 2. State out-of-scope items and already accepted follow-ups.
-3. Provide repo state pointers: changed files, relevant diff or commits, validation, and known residual risks.
+3. Provide repo state pointers: changed files, the phase change set, validation, and known residual risks.
 4. Ask for: reconstructed checklist; checklist result for every item; high, medium, and low misses; unverified requirements; `Completion estimate: NN%`; `Reasoning: 2-4 sentences`.
 5. Instruct the evaluator to behave like a fresh session asked whether the original plan was implemented correctly.
 6. Instruct the evaluator to judge requirement completion, not style or general architecture.
@@ -94,7 +94,7 @@ Do not clear the gate on percentage alone when high or medium misses exist.
 If high or medium misses remain:
 
 - identify missing requirements by checklist item
-- inside factory, hand them to [slicer](../../slicer/SKILL.md) rework mode (a); the repair slices go through sign-off, and the affected gate parts (verification, poker-face, review) rerun. Standalone, implement the missing work directly
+- inside factory, hand them to [slicer](../../slicer/SKILL.md) rework mode (a); the repair slices go through sign-off, and verification, poker-face, and review rerun for the affected scope (the repair slices' own changes are re-judged; verification covers the whole phase change set; accepted polish is not re-judged as phase work). Standalone, implement the missing work directly
 - update or rerun validation
 - rerun poker-face from the original target, not from the fix summary
 - continue until requirements clear, only low misses remain, or a real blocker requires user input; inside factory, its [phase gate](../../factory/references/loop.md#phase-gate) rules cap the rework cycles

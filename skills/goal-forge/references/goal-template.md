@@ -1,6 +1,6 @@
 # Goal Template
 
-Use this template for `GOAL.md`, handoff goals, PRD goal sections, or harness-native goal prep notes.
+Use this template for `docs/goals/<goal-name>/GOAL.md`, handoff goals, PRD goal sections, or harness-native goal prep notes.
 
 ```markdown
 # Goal: <short name>
@@ -110,7 +110,7 @@ Decision: <included / not included / ask user before implementation>
 
 not started
 
-<Updated by goal-check (readiness verdicts: verdict, evaluator mode, date, gaps), and by factory or campaign as work lands: milestone, commits, validation evidence.>
+<Updated by goal-check (readiness verdicts: verdict, evaluator mode, date, gaps), and by factory or campaign as work is accepted: milestone, accepted refs, validation evidence.>
 ```
 
 Keep the template specific. Delete empty sections only when they genuinely do not apply.

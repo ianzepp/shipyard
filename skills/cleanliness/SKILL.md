@@ -1,6 +1,6 @@
 ---
 name: cleanliness
-description: "Shape implementation code for managed complexity and run read-only cleanliness scans: module boundaries, function and file size, dispatch structure, helper extraction, guard clauses, naming consistency, and control-flow complexity. Use when refactoring code structure for maintainability without changing behavior, especially after LLM-generated work, before commits, or as a factory tidy slice."
+description: "Shape implementation code for managed complexity and run read-only cleanliness scans: module boundaries, function and file size, dispatch structure, helper extraction, guard clauses, naming consistency, and control-flow complexity. Use when refactoring code structure for maintainability without changing behavior, especially after LLM-generated work, before the work is accepted, or as a factory tidy slice."
 ---
 
 # Cleanliness
@@ -125,7 +125,7 @@ implement its own findings.
 
 Inside [factory](../factory/SKILL.md), cleanliness runs as the phase's final tidy slice, cut by [slicer](../slicer/SKILL.md) as `<prefix>-tidy` (depends on every other slice, `red_first: no`); factory's [order](../factory/SKILL.md#order) is the canonical sequence. In a tidy slice cleanliness never changes behavior.
 
-Default scope: code changed by the current **factory phase**; immediate local modules needed for coherent boundaries; tests only when test shape is a maintainability risk.
+Default scope: the **factory phase's change set** (everything changed since the phase base, per the [workflow](../factory/SKILL.md#workflow)); immediate local modules needed for coherent boundaries; tests only when test shape is a maintainability risk.
 
 Cleanliness may reshape (behavior-preserving): split along repo boundaries; extract domain-named helpers; move logic out of routes, facades, closures, or dispatch arms; add boundary and `WHY` comments; rename phase-introduced symbols.
 

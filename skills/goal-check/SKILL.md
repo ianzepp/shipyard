@@ -7,7 +7,7 @@ description: "Verify whether a goal document is defined enough to begin using as
 
 Pre-implementation readiness check for an **existing goal artifact**. Decide whether a goal is specific, grounded, bounded, architecturally decided, and testable enough that the next agent can start without inventing hidden scope.
 
-Optional skill. Not a completion gate for work that has already landed — that is [`poker-face`](../poker-face/SKILL.md).
+Optional skill. Not a completion gate for work that has already been built — that is [`poker-face`](../poker-face/SKILL.md).
 
 Goal-check uses a stricter handoff bar than goal-forge. A goal that only captures the desired architecture and rough implementation direction may be good goal-forge output, but it is not automatically ready for implementation. Goal-check judges the document against that bar and names every gap that keeps it from being deliverable to a competent implementer who was not in the conversation. It does not edit the goal's content: `NOT READY` lists the exact gaps, `goal-forge` (or the user) fills them, and goal-check runs again. It only records its verdict (see [Record The Verdict](#4-record-the-verdict)).
 
@@ -155,11 +155,11 @@ Uncertainty escalates; do not bluff.
 
 ### 4. Record The Verdict
 
-Write the verdict, evaluator mode, date, and any blocking gaps into the goal's `## Status` section, or into the run's ledger when one exists (see factory [Ledger File](../factory/references/loop.md#ledger-file)). This is the only edit goal-check makes, and it never touches the goal's other sections. The Status edit is bookkeeping; commit it under the user's commit unit (see factory [Commits](../factory/SKILL.md#commits)).
+Write the verdict, evaluator mode, date, and any blocking gaps into the goal's `## Status` section, or into the run's ledger when one exists (see factory [Ledger File](../factory/references/loop.md#ledger-file)). This is the only edit goal-check makes, and it never touches the goal's other sections. Leave the edit in place; factory intake records it per the workflow (see factory [Workflow](../factory/SKILL.md#workflow)).
 
 ## Output Format
 
-1. **Goal Check Summary** — artifact reviewed; evaluator mode (independent / cold self-pass); intended next consumer; handoff bar used; verdict
+1. **Goal Check Summary** — artifact reviewed; evaluator mode (independent / self-contained cold pass); intended next consumer; handoff bar used; verdict
 2. **Reasoning** — one short paragraph
 3. **Key Points** — flat bullets for main readiness findings, including architecture and implementation-path clarity
 4. **Blocking Gaps** — only when `NOT READY`

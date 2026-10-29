@@ -21,13 +21,13 @@ A factory phase can satisfy requirements (`poker-face`) and still be behaviorall
 
 ## Factory Phase Use
 
-Inside [factory](../factory/SKILL.md), correctness runs twice: as the correctness read of each slice diff at slice sign-off, and in the phase gate's review. Factory's [order](../factory/SKILL.md#order) is the canonical sequence.
+Inside [factory](../factory/SKILL.md), correctness runs twice: as the correctness read of each slice's own changes at slice sign-off (isolated per the [workflow](../factory/SKILL.md#workflow)), and in the phase gate's review over the phase change set. Factory's [order](../factory/SKILL.md#order) is the canonical sequence.
 
 - **Sign-off read is read-only.** Report findings by severity; make no edits. Any CRITICAL or HIGH finding (P0/P1, see [verdicts and severity](../factory/SKILL.md#verdicts-and-severity)) sends the slice back to its implementer; MEDIUM and LOW go to the ledger as notes.
 - **Gate review is read-only too.** Its findings go to [slicer](../slicer/SKILL.md#modes) rework mode (a); the repair slices run through sign-off, then the affected gate checks are rerun (see the [phase gate](../factory/references/loop.md#phase-gate)).
 - **Update mode is for correctness-mode phases** (a phase that is primarily bug-fixing or reliability hardening). Even there, the fixes run as slices with sign-off, not as ad-hoc edits. When the user clearly wants read-only diagnosis first, diagnose read-only first (find the cause before any fix).
 
-Scope to the active **factory phase** boundary and its delivery spec. Feed results into the phase ledger: what was wrong, fixed, validated, and any deferred structural issues.
+Scope to the active **factory phase** change set (everything since the phase base) and its delivery spec. Feed results into the phase ledger: what was wrong, fixed, validated, and any deferred structural issues.
 
 Use **Correctness Mode** inside factory when the phase is primarily bug-fixing, reliability hardening, or a user-requested correctness pass with fixes.
 

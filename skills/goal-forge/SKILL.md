@@ -5,7 +5,7 @@ description: "Converge fuzzy intent into a grounded, agent-ready goal document f
 
 # Goal Forge
 
-Conversational convergence for **one focused problem** before execution. Lock the problem shape, desired architecture, and rough implementation direction, gather evidence, then write a single **goal artifact** (usually `GOAL.md`). Does not implement the goal.
+Conversational convergence for **one focused problem** before execution. Lock the problem shape, desired architecture, and rough implementation direction, gather evidence, then write a single **goal artifact** (`GOAL.md`, in its own directory). Does not implement the goal.
 
 Optional upstream skill. Run when intent is fuzzy and the outcome should be one bounded target — not when several tracks already need a coordination map (use `campaign` instead).
 
@@ -15,7 +15,7 @@ Goal-forge operates at the **architecture and milestone** level. It should answe
 
 | Term | Scope | Meaning |
 | --- | --- | --- |
-| **Goal artifact** | `goal-forge` | Single focused document (`GOAL.md`, etc.) defining one problem boundary and desired end state. |
+| **Goal artifact** | `goal-forge` | Single focused document (`GOAL.md`) defining one problem boundary and desired end state. |
 | **Campaign artifact** | `campaign` | Multi-track routing document coordinating several goals, bugs, features, or cleanup families. |
 | **Delivery spec** | `delivery` | Repo-aware plan for one phase (one coherent outcome). Lower from goal or campaign — not produced here. |
 | **Factory phase** | `factory` | Execution cycle for one phase: a group of slices whose phase gate is evaluated together. |
@@ -51,7 +51,7 @@ Factory [`vision`](../factory/references/vision.md) validates goal readiness at 
 ## Core Rules
 
 - Do not implement code, migrations, UI, scripts, docs, or product changes — except writing or updating the goal artifact.
-- The goal artifact is a plan artifact: commit it when written or approved as `docs(plan): <name>`, following the user's commit unit (see factory [Commits](../factory/SKILL.md#commits)).
+- Write the goal artifact and leave it in place. Factory intake records it per the workflow (see factory [Workflow](../factory/SKILL.md#workflow)).
 - Do not create a harness-native goal or task object (if your tool has one) unless the user explicitly asks for one.
 - When the user asks for `GOAL.md`, handoff, or PRD goal section, write the artifact — not a harness-native goal.
 - Do not generate the final goal document until the problem shape is locked or the user explicitly asks for a rough draft.
@@ -59,7 +59,7 @@ Factory [`vision`](../factory/references/vision.md) validates goal readiness at 
 - Target detail level: nail down the desired architecture, key invariants, rough implementation shape, and first useful milestone. Write a First Implementation Path for the first milestone only: the modules, files, or services where the first edit happens, enough for an implementer to start. Leave full file-by-file sequencing, exact edits, and mechanical task order to `delivery` and `slicer` unless the user explicitly wants them in the goal.
 - Ask when the answer is a preference, authorization decision, or material ambiguity that cannot be discovered locally.
 - Ask one question at a time unless a small related batch is clearly better.
-- Stay on the current branch unless the user asks for a new one.
+- Do not create or switch branches; factory does that at intake (see factory [Workflow](../factory/SKILL.md#workflow)).
 
 ## When To Use
 
@@ -90,7 +90,7 @@ Accept: raw idea; feeling the goal is not yet definable; existing `GOAL.md`, PRD
 
 - User provides a path → inspect before overwriting.
 - User references an existing goal → update in place unless they ask for a separate draft.
-- No path → `GOAL.md` at the repo root or the repo's docs directory, per repo convention. Record the path used.
+- No path → pick a short kebab-case `<goal-name>` (for example `csv-export`) and write `docs/goals/<goal-name>/GOAL.md`, unless the repo has its own convention for where such documents live. Factory keeps the ledger, phase specs, slice files, and audit reports in the same directory. Record the path used.
 - Multiple plausible roots → inspect layout; choose the most local root for the work.
 - Full goal in chat only when the user asks for inline draft or filesystem writes are blocked.
 

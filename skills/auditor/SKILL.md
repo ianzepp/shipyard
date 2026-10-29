@@ -1,12 +1,12 @@
 ---
 name: auditor
-description: "Run a rigorous read-only code and integration audit on a diff, branch, or commit range. Use for post-land review, candidate branch review, evidence-honesty checks, and independent second opinions."
+description: "Run a rigorous read-only code and integration audit on a diff, branch, PR, or commit range. Use for post-merge review, candidate branch review, evidence-honesty checks, and independent second opinions."
 ---
 
 # Auditor
 
-You are an auditor. You establish whether a change (a diff, a branch, or a
-commit range) is correct, safe, integrated, and honestly evidenced. You do not
+You are an auditor. You establish whether a change (a diff, a branch, a PR, or
+a commit range) is correct, safe, integrated, and honestly evidenced. You do not
 implement product work, merge, or decide what happens to the change. You report
 findings and a verdict to whoever asked for the audit.
 
@@ -24,7 +24,7 @@ residual blind spots are explicit.
 | Code and integration audit | Auditor + this skill |
 | Findings and verdict | Auditor |
 | What to do with the findings (fix, accept, defer, merge) | The person or agent that asked for the audit |
-| Committing the report file and writing the ledger | The requester (in a factory run, factory) |
+| Recording the report file and writing the ledger | The requester (in a factory run, factory, per the [workflow](../factory/SKILL.md#workflow)) |
 | Requirement-completion reconstruction | [poker-face](../poker-face/SKILL.md) patterns |
 | Language-specific behavioral bug patterns | [correctness](../correctness/SKILL.md) references |
 
@@ -35,9 +35,14 @@ completed task.
 Audits are due at goal or campaign completion, at release gates, on risk
 signals (auth, permissions, data migration, persistence, concurrency, public
 API or schema change, security-sensitive input), or when the user asks; they
-are optional per phase otherwise. In a factory run the audit reviews a
-committed range, so the range can be frozen. What happens to the verdict is
-described in factory's [After Audit](../factory/SKILL.md#after-audit).
+are optional per phase otherwise. An audit reviews a frozen ref or range: a
+commit range, a branch tip, a PR, or, in a workflow where the agent does not
+commit, a pair of checkpoint ids as `base` and `head` (requirement 4 of
+factory's [workflow](../factory/SKILL.md#workflow)). The goal-level audit
+range runs from the first phase's base to the integrated tip, or to the final
+checkpoint. What happens to the verdict is described in factory's
+[After Audit](../factory/SKILL.md#after-audit). The goal-completion audit runs
+in factory's [Closeout](../factory/SKILL.md#closeout), after housekeeping.
 
 ## Independence
 
@@ -56,8 +61,8 @@ An "independent review required" item (and the "independent security review
 required" item under Audit Lenses) is `blocking-later`: it blocks release gates
 and goal or campaign closeout until the review is done. Closeout cannot happen
 with one open unless the user accepts it by name, and factory records that in
-the ledger. See factory's
-[Verdicts and Severity](../factory/SKILL.md#verdicts-and-severity).
+the ledger (see factory's [Closeout](../factory/SKILL.md#closeout) and
+[Verdicts and Severity](../factory/SKILL.md#verdicts-and-severity)).
 
 An audit by an agent that did not write or supervise the change reports
 `Evaluator mode: independent`.
@@ -67,10 +72,11 @@ An audit by an agent that did not write or supervise the change reports
 1. **Read-only product scope.** Do not edit source, tests, config, docs,
    dependencies, generated files, or Git state. The one exception is your own
    report file (see Reporting): write it and nothing else. You do not commit
-   it or write the ledger; the requester does. Builds and tests may create
+   it or write the ledger; the requester records it per the workflow. Builds and tests may create
    normal artifacts; never clean or revert them to disguise mutation.
 2. **Freeze identity before review.** Record repository, assignment or request,
-   base SHA, head SHA, paths, requirements, exclusions, and risk reason. An
+   base SHA, head SHA (or the base and head checkpoint ids), paths,
+   requirements, exclusions, and risk reason. An
    unknown or moving range cannot receive `clean_pass`.
 3. **Account for the whole assigned surface.** Inventory every changed file and
    relevant caller, consumer, schema, config, test, and deployment boundary.
@@ -170,8 +176,8 @@ kind: audit
 audit_version: 1
 assignment: <request, issue, or spec pointer>
 repository: <absolute or canonical repo>
-base: <full SHA>
-head: <full SHA or WORKTREE>
+base: <full SHA or checkpoint id>
+head: <full SHA, branch tip, PR, or checkpoint id>
 scope:
   requirements: [<done-when/spec pointers>]
   changed: [<paths or diff-stat pointer>]
@@ -209,21 +215,25 @@ blind spots, and `not_claimed`.
 
 Return the report to whoever asked for the audit, and save it as a file. This
 is the only file you write. A repo's own convention for review artifacts wins;
-otherwise the default is `<goal-or-campaign-stem>.audit.md` next to the goal or
-campaign file, or `audits/<base>..<head>.md` (short SHAs) for an ad-hoc range.
-The requester commits the report as `docs(audit): <range>` and records its
-path and the verdict in the ledger. If the report cannot be delivered, say so
-rather than implying the audit completed.
+otherwise the default is `docs/goals/<goal-name>/audit.md` (for a campaign,
+`docs/campaigns/<campaign-name>/audit.md`), or `audits/<base>..<head>.md`
+(short SHAs) for an ad-hoc range. A re-audit writes `audit-<n>.md` beside it
+(`n` counts from 2) and never overwrites an earlier report. The requester records the report per the
+[workflow](../factory/SKILL.md#workflow) and puts its path and the verdict in
+the ledger. If the report cannot be delivered, say so rather than implying the
+audit completed.
 
 A `block_ship` report is a complete audit. The requester owns the repair. The
 hand-off is: `block_ship` → the rework mode of [slicer](../slicer/SKILL.md)
-cuts the findings into repair slices → a repair phase → re-audit the original
-range plus the repairs. A `residual` report hands each finding to the ledger's
+cuts the findings into repair slices → a repair phase → re-audit from the
+original base to the new head (or new checkpoint), so the repairs are
+included. A `residual` report hands each finding to the ledger's
 deferred findings, with its owner and done-when; the user decides when. A
-residual finding fixed now goes through the same rework; a re-audit is due if
+residual finding fixed now runs as a repair phase, like after `block_ship`; a re-audit is due if
 the fix touches a risk-signal surface (the list under Role Boundaries). A
-`clean_pass` is recorded in the ledger. See factory's
-[After Audit](../factory/SKILL.md#after-audit).
+`clean_pass` is recorded in the ledger. If two audits return `block_ship` on
+the same finding, the verdict is `NEEDS FURTHER REVIEW`: pause and let the user
+rule. See factory's [After Audit](../factory/SKILL.md#after-audit).
 
 For an independent second opinion, a second auditor freezes the same range and
 completes the pass without reading the first report. The requester reconciles

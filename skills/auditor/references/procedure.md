@@ -20,26 +20,33 @@ Record the review identity before reading the implementation narrative deeply:
 ```text
 assignment or request
 repository and owning checkout
-base SHA
-head SHA, or WORKTREE with status snapshot
+base SHA, or checkpoint id
+head SHA, branch tip, PR, or checkpoint id
 named paths and explicit exclusions
 done-when, specification, issue, or user request
 risk reason and expected validation
 ```
 
 Use full SHAs in the final report. For a branch, derive the base using the
-assignment's target branch and verify the merge-base is intended. For a landed
-range, verify both endpoints exist on the expected history. For uncommitted
-work, record `git status --short`, staged and unstaged surfaces separately, and
-do not silently include later edits.
+assignment's target branch and verify the merge-base is intended. For a merged
+range, verify both endpoints exist on the expected history. For work that is
+not yet recorded in history (a workflow where the agent does not commit), the
+requester supplies checkpoint ids as base and head (a checkpoint is a saved
+snapshot of the working tree; see factory's
+[workflow](../../factory/SKILL.md#workflow)). Review the difference between
+them, record `git status --short`, and do not silently include later edits; the
+range must stay unchanged for the whole audit (requirement 4 of the workflow).
+A goal-level audit runs from the first phase's base to the integrated tip or
+the final checkpoint; a re-audit after repairs runs from the original base to
+the new head.
 
 If the assignment does not identify a stable range, report the ambiguity to
 the requester. Review may proceed for useful findings, but verdict cannot be
 `clean_pass` until identity is stable.
 
-Inspect uncommitted changes you did not make rather than normalizing them. If
-they overlap the review surface, state whether the range can still be
-reconstructed exactly. Never stash, restore, reset, clean, or overwrite them.
+Inspect changes in the working tree that you did not make rather than
+normalizing them. If they overlap the review surface, state whether the range
+can still be reconstructed exactly. Never discard or overwrite them.
 
 ## 2. Assemble The Audit Packet
 
@@ -81,7 +88,7 @@ auditor still owns behavioral and integration correctness beyond that checklist.
 
 Start with commit and path inventory, then inspect content:
 
-- commits in the exact range, including merges
+- commits (or checkpoints) in the exact range, including merges
 - diff stat and every changed, added, deleted, renamed, generated, or vendored path
 - submodule, lockfile, manifest, workflow, infrastructure, migration, fixture,
   snapshot, schema, public API, and documentation changes
@@ -272,7 +279,9 @@ was not proven: production behavior, global repository correctness, external
 service behavior, or performance under load unless directly evidenced.
 
 Save the report as your own report file (path convention in `SKILL.md`,
-Reporting) and return it to the requester, who commits it as
-`docs(audit): <range>` and writes the ledger. That file is the only thing you
-write. If delivery fails, report the failure; do not falsely claim the audit
+Reporting: `audit.md`, then `audit-<n>.md` for a re-audit) and return it to the
+requester, who records it per the
+[workflow](../../factory/SKILL.md#workflow) and writes the ledger. A re-audit
+never overwrites an earlier report. That file
+is the only thing you write. If delivery fails, report the failure; do not falsely claim the audit
 was delivered.

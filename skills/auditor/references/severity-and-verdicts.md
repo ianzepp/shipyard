@@ -10,7 +10,7 @@ evidence or lower it because a fix seems easy.
 | --- | --- | --- | --- |
 | **P0** | Active or immediately exploitable catastrophic failure with broad or irreversible impact | Cross-tenant disclosure in a live path, destructive migration/data wipe, credential compromise, systemic outage trigger | `block_ship`; immediate escalation to the requester and security/ops owners |
 | **P1** | Ship-blocking correctness, security, data, availability, or contract failure under realistic conditions | Auth bypass, corruption, broken primary workflow, unsafe migration, deadlock, incompatible API/schema rollout, silent material loss | `block_ship`; repair owned by the implementer or a specialist |
-| **P2** | Real bounded defect or material evidence gap that does not make the reviewed change unsafe to land under current conditions | Incorrect edge case, missing noncritical negative test, bounded cleanup leak, misleading operational signal, incomplete supporting integration | `residual`; named owner and observable done-when |
+| **P2** | Real bounded defect or material evidence gap that does not make the reviewed change unsafe to merge under current conditions | Incorrect edge case, missing noncritical negative test, bounded cleanup leak, misleading operational signal, incomplete supporting integration | `residual`; named owner and observable done-when |
 
 Do not report style, naming preference, speculative architecture, or generic
 best practice as P2. Route maintainability to [cleanliness](../../cleanliness/SKILL.md), and treat

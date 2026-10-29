@@ -1,4 +1,4 @@
 interface:
   display_name: "Polish"
   short_description: "Run a disciplined per-file polish pass."
-  default_prompt: "Use $polish to polish each source file one at a time with correctness, subtractive cleanup, tests, grounded source presentation, directly related docs, targeted validation, and cohesive commits. Follow repository-specific documentation policy without inventing rationale or history."
+  default_prompt: "Use $polish to polish each source file one at a time with correctness, subtractive cleanup, tests, grounded source presentation, directly related docs, targeted validation, and a cohesive record per file (one commit per file is the recommendation in a committing workflow). Follow repository-specific documentation policy without inventing rationale or history."

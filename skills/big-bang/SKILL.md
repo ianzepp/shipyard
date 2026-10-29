@@ -44,7 +44,7 @@ Big Bang is upstream of `goal-forge`, `delivery`, and `factory`:
 - use `delivery` when one chosen branch needs to become an executable delivery
   plan with stages, workstreams, checkpoints, and gates
 - use `factory` when the chosen branch has become a multi-phase phase set that
-  should be executed, checked, committed, and resumed autonomously
+  should be executed, checked, recorded, and resumed autonomously
 - use `goal-forge` when a rough idea needs one grounded goal document before
   any plan or execution
 
@@ -166,8 +166,8 @@ Invoke `factory` when:
 - the user asks to execute, keep going autonomously, or run the phase set
 - there is a durable phase list or lifecycle tree
 - each phase can have a delivery spec, checkpoint target, validation policy,
-  and commit unit (per-slice by default; see factory
-  [Commits](../factory/SKILL.md#commits))
+  and workflow (how changes are isolated, made durable, and integrated; see
+  factory [Workflow](../factory/SKILL.md#workflow))
 - the work should continue across many turns or compaction cycles without
   restarting the idea discovery process
 
@@ -178,7 +178,7 @@ When handing off to factory, prepare a compact factory-ready bundle:
 - `Target Workspace`
 - `Delivery Spec Directory`
 - `Checkpoint Policy`
-- `Commit Unit`
+- `Workflow`
 - `Completed Big Bang Artifacts`
 - `Open Questions`
 - `Stop Or Escalation Conditions`

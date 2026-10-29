@@ -64,7 +64,7 @@ These agents must: verify tests match the implementation contract; catch invente
 
 ## 5. Run Tests And Record Failures
 
-After both writing passes, run relevant tests. Inside factory, each slice's tests are run at its sign-off instead, with the `red_first` record kept in the ledger ([slice runner](../../factory/references/loop.md#running-a-slice-list)). For new behavior or a bug fix, run the new test first against the unfixed code and record that it fails for the right reason (the missing behavior or the bug itself). If it passes, or fails for another reason, the test is wrong: fix the test before touching the implementation. Then apply the fix and run in this order:
+After both writing passes, run relevant tests. Inside factory, authored tests are accepted as slices per the [workflow](../../factory/SKILL.md#workflow), and each slice's tests are run at its sign-off instead, with the `red_first` record kept in the ledger ([slice runner](../../factory/references/loop.md#running-a-slice-list)). For new behavior or a bug fix, run the new test first against the unfixed code (on a brand-new module, stub the interface first so the test fails on behavior, not on a missing import) and record that it fails for the right reason (the missing behavior or the bug itself). If it passes, or fails for another reason, the test is wrong: fix the test before touching the implementation. Then apply the fix and run in this order:
 
 1. targeted tests for newly changed surfaces
 2. adjacent package or module tests if cheap

@@ -30,16 +30,16 @@ Not a broad code review, architecture critique, or replacement for [$correctness
 
 ## Factory Phase Use
 
-Mandatory at the phase gate inside [factory](../factory/SKILL.md) whenever a goal, spec, or acceptance criteria exist; equally usable standalone. It runs over the [phase change set](../factory/references/loop.md#phase-gate) (committed, or signed off and staged, per the commit unit), after verification and before review; see factory's phase loop for the full sequence.
+Mandatory at the phase gate inside [factory](../factory/SKILL.md) whenever a goal, spec, or acceptance criteria exist; equally usable standalone. It runs over the phase change set (from the phase base to the current accepted state, as the run's [workflow](../factory/SKILL.md#workflow) provides it; see factory's [phase gate](../factory/references/loop.md#phase-gate)), after verification and before review; see factory's phase loop for the full sequence. In a repair phase (the rework of a `block_ship` audit, or of a residual finding fixed now) there is no spec: it judges the repairs against the audit findings' done-when. Repair slices are `repair<n>-<k>` in `docs/goals/<goal-name>/repair-<n>.slices.md`; the findings are in `audit.md` or `audit-<n>.md` beside it.
 
 Rules when used in a factory phase:
 
-- Compare against: factory phase boundary, saved delivery spec, acceptance criteria, the phase's commits and changed files, validation results, residual correctness risks.
+- Compare against: factory phase boundary, saved delivery spec, acceptance criteria, the phase change set and its changed files, validation results, residual correctness risks.
 - Any **high miss** → gate cannot pass; send the misses to slicer rework mode (a).
 - Any **medium miss** → gate cannot pass unless deferring it has the user's approval or the plan already names it as deferred. Surface each medium miss to the user before the gate passes; on approval, record it in the ledger as a deferred finding (owner and done-when). A medium miss that breaks an acceptance criterion is never deferrable.
 - **Unverified core requirement** → gate cannot pass until verified or downgraded with evidence.
 - Only **low misses** or approved deferrals → continue toward the checkpoint.
-- **Misses are repaired through rework.** Slicer cuts repair slices from the misses; the repair slices go through sign-off, and the affected gate parts (verification, poker-face, review) rerun. See factory's [phase gate](../factory/references/loop.md#phase-gate). Standalone use, outside factory, may simply return to implementation.
+- **Misses are repaired through rework.** Slicer cuts repair slices from the misses; the repair slices go through sign-off, and verification, poker-face, and review rerun for the affected scope: the repair slices' own changes are re-judged, verification runs over the whole phase change set, and polish edits already accepted are listed in the checkpoint as accepted polish, not re-judged as phase work. See factory's [phase gate](../factory/references/loop.md#phase-gate). Standalone use, outside factory, may simply return to implementation.
 - **Completion estimate is secondary.** Miss classification blocks; percentage alone does not clear the gate.
 - Skip poker-face only when no goal, spec, or acceptance criteria exist; record the skip reason, or the verdict and evaluator mode, in the Checkpoint section of the [ledger](../factory/references/loop.md#ledger-file). "Delegation unavailable" or "too costly" is not a skip reason: with no subagent, run a self-contained cold pass (procedure step 4) and report `Evaluator mode: self-contained cold pass`.
 - Poker-face does not replace correctness. A phase can satisfy requirements on paper and still be behaviorally wrong.
@@ -66,7 +66,7 @@ Do not use when:
 - The original plan is source of truth. The implementer's summary, commit message, changed-file list, and validation notes are evidence, not authority.
 - Reconstruct a checklist of every promised behavior, file, command, workflow, migration, test, documentation change, and explicit non-goal that matters to the work under audit.
 - Inspect actual repository state for each item. Changed files are clues, not proof.
-- Prefer direct evidence: code paths, tests, generated artifacts, command output, docs, configs, schemas, routes, APIs, CLI behavior, committed files.
+- Prefer direct evidence: code paths, tests, generated artifacts, command output, docs, configs, schemas, routes, APIs, CLI behavior, files in the change set.
 - Mark every item: `SATISFIED`, `PARTIAL`, `MISSING`, `UNVERIFIED`, or `NOT APPLICABLE`.
 - Classify every `PARTIAL`, `MISSING`, and `UNVERIFIED` item as `HIGH`, `MEDIUM`, or `LOW`.
 - **HIGH** — core promised outcome absent, broken, unverified where verification was required, or in the wrong place.
@@ -83,11 +83,11 @@ Do not use when:
 Assemble before evaluation. A cold reader must be able to rerun the audit from this packet.
 
 - `Original Target`: user request, issue, roadmap item, factory phase name
-- `Delivery Spec`: saved artifact path, if one exists
+- `Delivery Spec`: saved artifact path, if one exists, such as `docs/goals/<goal-name>/phase-<n>.md` (in a repair phase, the audit report whose findings' done-when is the target)
 - `Acceptance Criteria`: expected outputs and checkpoint target
 - `Out Of Scope`: exclusions that should not count against completion
 - `Requirement Checklist`: reconstructed before judging implementation
-- `Repo State`: `git status`, relevant diff or commits, changed files
+- `Repo State`: the phase change set (diff from the phase base), changed files, `git status`
 - `Validation`: commands run, results, skipped checks
 - `Known Residual Risks`: risks from correctness or verification
 - `Follow-Ups Already Accepted`: deferrals the user approved or the plan names, which should not block this phase
