@@ -1,8 +1,8 @@
 # Factory And Delivery Bridge
 
-Big Bang should learn from `delivery` and `factory` without becoming either one.
+Big Bang should learn from `goal-forge`, `delivery`, and `factory` without becoming any of them.
 
-`delivery` is the compiler for a selected branch. `factory` is the long-running
+`goal-forge` converges one chosen branch into a grounded goal document. `delivery` is the compiler for a selected branch. `factory` is the long-running
 supervisor for a selected phase set. Big Bang is the discovery engine that
 creates enough structured material for either handoff to work.
 
@@ -10,7 +10,7 @@ Big Bang does not implement. For software projects, it may explore architecture
 futures, product surfaces, operational consequences, sequencing, risk, and
 planning paths, but it should not generate application code, scaffold a
 repository, install dependencies, or begin execution. Use Big Bang to decide
-where the project should go; use `delivery` or `factory` after a branch is ready
+where the project should go; use `goal-forge`, `delivery`, or `factory` after a branch is ready
 to become implementation work.
 
 Big Bang should not require the user to select every branch before exploration
@@ -26,7 +26,7 @@ Borrow these patterns before any implementation handoff:
 - `interpreted problem`: restate the rough idea's real center
 - `normalized spec`: split facts, assumptions, constraints, and open questions
 - `artifact flow`: name what each artifact consumes and produces
-- `stage graph`: sketch how a branch would unfold if selected
+- `milestone graph`: sketch how a branch would unfold if selected
 - `checkpoint target`: describe what would prove a branch is ready to promote
 - `gate criteria`: state what would make the branch pass, fail, or need review
 - `decision ledger`: record provisional branch choices, parked branches, and
@@ -45,10 +45,32 @@ Borrow these patterns when the idea starts spanning many turns:
 - continue down a provisional lead branch rather than waiting at every fork
 - define checkpoint policies for branch promotion
 - record what would trigger delivery or factory handoff
-- keep compaction recovery state in chat or in a repo-local artifact
+- keep recovery state in a repo-local artifact, not only in chat
 
 The factory-like behavior here is supervision, not execution. Big Bang supervises
 idea expansion until the work becomes executable.
+
+## Goal-Forge Handoff Packet
+
+Create this when one branch is chosen but the problem still needs to be locked
+and grounded in the repo before any plan. `goal-forge` takes it as its starting
+input, then verifies the evidence itself.
+
+```markdown
+## Goal-Forge Handoff
+
+Chosen branch:
+
+Why this branch:
+
+Evidence for it (artifacts, files, data, user statements):
+
+Rejected or parked branches:
+
+Known constraints and non-goals:
+
+Open decisions:
+```
 
 ## Delivery Handoff Packet
 
@@ -69,7 +91,7 @@ Known constraints:
 
 Required repo or workspace context:
 
-Suggested stage graph:
+Suggested milestone graph:
 
 Checkpoint targets:
 
@@ -96,7 +118,7 @@ Delivery Spec Directory:
 
 Checkpoint Policy:
 
-Commit Policy:
+Commit Unit (per-slice by default):
 
 Agent Policy:
 
@@ -111,6 +133,13 @@ Stop Or Escalation Conditions:
 
 ## Promotion Rules
 
+Promote from Big Bang to goal-forge when:
+
+- the user has chosen a branch, or a provisional branch is ready for approval
+- the problem is still fuzzy in the repo's terms: architecture, first milestone,
+  and acceptance criteria are not yet written down
+- the next useful artifact is one grounded goal document, not yet a plan
+
 Promote from Big Bang to delivery when:
 
 - the user has chosen a branch, or the agent has clearly marked a provisional
@@ -124,7 +153,7 @@ Promote from Big Bang to factory when:
 
 - the user wants autonomous multi-phase execution
 - the phase list is durable enough to survive compaction
-- checkpoints and commit boundaries are clear
+- checkpoints are clear and the commit unit is chosen (per-slice by default; see factory [Commits](../../factory/SKILL.md#commits))
 - the work is no longer primarily about discovering the idea
 
 Stay in Big Bang when:

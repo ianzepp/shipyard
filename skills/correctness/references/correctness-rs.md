@@ -112,7 +112,7 @@ If the project has a `tests/hygiene.rs` ratchet test, your fixes must account fo
 
 After fixing, run the narrowest test scope that proves the change (`cargo test -p <crate>`), and widen when the change crosses crates.
 - If tests fail due to your fix, investigate whether the test was relying on incorrect behavior. Fix the test if so. Revert your fix if the test was correct and your fix was wrong.
-- Tests must be in-memory and require no external services. Test files are colocated with source as `*.test.rs` (or `*_test.rs` — match the project convention), imported via `#[cfg(test)] #[path = "..."] mod tests;`.
+- Tests must be in-memory and require no external services. Follow the repo's test layout convention (inline `#[cfg(test)]` modules, colocated test files, or a `tests/` directory).
 
 ## What You Do NOT Do
 

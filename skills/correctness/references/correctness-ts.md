@@ -129,7 +129,7 @@ If the project has a hygiene ratchet test, your fixes must account for its budge
 
 ### Test verification
 
-After fixing, run the full test suite (`npm test` or the project-configured equivalent).
+After fixing, run the narrowest test scope that proves the change (a single test file or package via `npm test` or the project-configured equivalent), and widen when the change crosses packages.
 - If tests fail due to your fix, investigate whether the test was relying on incorrect behavior.
 - Tests should be in-memory and require no external services. Match the repo's colocated `*_test.ts` or `*.test.ts` convention.
 

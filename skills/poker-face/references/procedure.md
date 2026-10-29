@@ -6,7 +6,7 @@ Detailed audit mechanics. The skill's `SKILL.md` owns gate rules, factory placem
 
 Reread the original target material before reading the implementer's completion summary.
 
-Write a short summary of what "done" means for this slice. Use the delivery spec or checkpoint target when available. The target must be concrete enough that a second reader can compare it against the diff.
+Write a short summary of what "done" means for this work. Use the delivery spec or checkpoint target when available. The target must be concrete enough that a second reader can compare it against the diff.
 
 ## 2. Build The Requirement Checklist
 
@@ -38,9 +38,11 @@ Do not accept "changed file X" as proof that requirement Y is satisfied. Point t
 
 ## 4. Run The Independent Audit
 
-Use an independent evaluator agent when delegation is available and allowed.
+Poker-face is mandatory at the phase gate when a goal, spec, or acceptance criteria exist. It is skipped only when none exist, with the reason recorded in the Checkpoint section of the [ledger](../../factory/references/loop.md#ledger-file). Delegation being unavailable or costly is not a reason to skip.
 
-If a subagent cannot be used, perform a separate evaluator pass and report:
+Use an independent evaluator agent when your tool supports subagents.
+
+With no subagent, run a self-contained cold pass instead: write the requirement checklist from the plan and acceptance criteria before reading any summary, ledger, or commit message, then inspect the committed range against it. Report:
 
 - `Evaluator mode: self-contained cold pass`
 - why no subagent was used
@@ -79,11 +81,11 @@ Calculate:
 
 Interpretation — **miss classification is authoritative**:
 
-- any high miss → requirements missed; return to implementation
-- any medium miss without explicit accepted deferral → requirements missed; return to implementation
-- unverified requirement affecting a core promise → classify as high or medium; return to implementation
-- only low misses or accepted deferrals → gate may clear
-- completion estimate below `95%` with no high/medium misses → explain why the gate still clears, or return to implementation
+- any high miss → requirements missed; route to rework (see step 6)
+- any medium miss without an approved deferral (the user's approval, or the plan already naming it as deferred, surfaced before the gate passes) → requirements missed; route to rework
+- unverified requirement affecting a core promise → classify as high or medium; route to rework
+- only low misses or approved deferrals → gate may clear
+- completion estimate below `95%` with no high/medium misses → explain why the gate still clears, or route to rework
 
 Do not clear the gate on percentage alone when high or medium misses exist.
 
@@ -92,9 +94,9 @@ Do not clear the gate on percentage alone when high or medium misses exist.
 If high or medium misses remain:
 
 - identify missing requirements by checklist item
-- implement the missing work
+- inside factory, hand them to [slicer](../../slicer/SKILL.md) rework mode (a); the repair slices go through sign-off, and the affected gate parts (verification, poker-face, review) rerun. Standalone, implement the missing work directly
 - update or rerun validation
 - rerun poker-face from the original target, not from the fix summary
-- continue until requirements clear, only low misses remain, or a real blocker requires user input
+- continue until requirements clear, only low misses remain, or a real blocker requires user input; inside factory, its [phase gate](../../factory/references/loop.md#phase-gate) rules cap the rework cycles
 
 Do not declare victory on a known miss.

@@ -57,6 +57,12 @@ Allowed only when there is no ship blocker and at least one of these remains:
 Every residual needs an owner or `unresolved`, a done-when, and its effect on
 the reviewed change.
 
+An "independent review required" or "independent security review required"
+item is `blocking-later` for release gates and goal or campaign closeout (see
+factory's [Verdicts and Severity](../../factory/SKILL.md#verdicts-and-severity)).
+A residual the requester fixes now goes through rework, and a re-audit is due
+if the fix touches a risk-signal surface.
+
 ### `clean_pass`
 
 Allowed only when all are true:
@@ -69,6 +75,13 @@ Allowed only when all are true:
 - there are no P0, P1, or P2 findings
 - blind spots are empty or demonstrably immaterial and disclosed
 - the report states what was not claimed
+- for a self-audit (`Evaluator mode: self-audit`) of a change touching auth,
+  permissions, tenancy, data migration, persistence formats, or
+  security-sensitive input: a separate reviewer has signed off. Otherwise the
+  verdict is `residual` with an "independent review required" item
+- for a critical-risk audit: any required independent security review has
+  been done; otherwise the verdict is `residual` with an "independent
+  security review required" item naming the surfaces
 
 A clean pass can coexist with pre-existing failures only when evidence proves
 they predate the range and do not prevent validation of the changed behavior.

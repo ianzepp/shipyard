@@ -31,6 +31,7 @@ Do not use it when:
 - Step order matters. Do not skip ahead to writing tests before the coverage and decomposition audits are done.
 - When delegation is available, use independent passes rather than treating the first draft of tests as final.
 - Do not declare success on added tests that were never executed.
+- Inside factory, authored tests and testability refactors run as slices: they feed [$slicer](../../slicer/SKILL.md) and land through [slice sign-off](loop.md#running-a-slice-list), where they are run (red-first for new behavior or a bug fix). The standalone rule "do not run tests during Wave 1 or Wave 2" does not apply inside factory.
 - Preserve the baseline. Separate ambient failures from failures introduced by the testing effort.
 
 ## Entry Conditions
@@ -78,7 +79,7 @@ This step should produce a concrete decomposition plan, not generic advice.
 
 ### 3. First Pass: Author Aggressive Unit Tests
 
-Prefer disjoint ownership if using agents.
+Prefer disjoint ownership if using agents. Inside factory, each batch of authored tests is a slice with its own write scope.
 
 Bias toward:
 
@@ -93,7 +94,7 @@ Bias toward:
 
 ### 4. Second Pass: Verify The First Pass
 
-Review the newly added tests independently when possible.
+Review the newly added tests independently when possible. Without delegation, run this pass as a self-contained cold pass and report `Evaluator mode: self-contained cold pass`.
 
 Check for:
 
@@ -105,13 +106,13 @@ Check for:
 
 ### 5. Run The Tests And Classify Failures
 
-After both writing passes are complete, run the relevant tests.
+After both writing passes are complete, run the relevant tests. Inside factory, the targeted tests already ran at each slice's sign-off; this step is the widening at the phase gate.
 
-Preferred order:
+Preferred order, narrowest first, widening at checkpoints (see [Verification scoping](loop.md#verification-scoping)):
 
 1. targeted tests for the newly changed surfaces
 2. adjacent package or module tests if cheap
-3. the broader relevant suite
+3. the broader relevant suite, at the phase checkpoint
 
 Record:
 
@@ -122,7 +123,7 @@ Record:
 
 ## Clearance Decision
 
-At the end of the loop, decide whether:
+At the end of the loop, issue the red-green clearance verdict (`CLEARED`, `NOT CLEARED`, or `BLOCKED`; mapped to the factory gate in [factory's Verdicts and Severity](../SKILL.md#verdicts-and-severity)) and decide whether:
 
 - the surface is now sufficiently hardened
 - the implementation needs additional decomposition

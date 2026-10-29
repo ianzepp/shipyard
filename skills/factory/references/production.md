@@ -1,24 +1,25 @@
 # Production
 
-Use this reference inside `factory` after [$vision](vision.md) has confirmed an
+Use this reference inside `factory` after [vision](vision.md) has confirmed an
 execution-ready goal boundary.
 
-Production turns a roadmap, slice plan, milestone list, or epic set into
-delivery-sized units. It does not compile implementation work; that belongs to
-[$delivery](../../delivery/SKILL.md). It does not execute; that belongs to [$loop](loop.md).
+Production turns a roadmap, milestone list, campaign stage list, or epic set into
+phase candidates: phase-sized outcomes, each compiled into one delivery spec
+and run as one factory phase. It does not compile implementation work; that belongs to
+[$delivery](../../delivery/SKILL.md). It does not execute; that belongs to [loop](loop.md).
 
 ## Purpose
 
 Production answers:
 
 ```text
-What is the next delivery-sized unit factory should compile and execute?
+What is the next phase candidate factory should compile and execute?
 ```
 
 ## Inputs
 
 - vision readiness record
-- roadmap docs, slices, milestones, epics, issue sets, or prior plans
+- roadmap docs, milestones, campaign stages, epics, issue sets, or prior plans
 - repo ownership boundaries and current worktree state
 - existing delivery specs and completed commits
 - deferred findings from prior phases
@@ -29,30 +30,30 @@ Maintain a production ledger with:
 
 - `Vision Source`
 - `Roadmap Units`
-- `Delivery-Sized Units`
-- `Generated Delivery Specs`
-- `Current Unit`
-- `Completed Units`
-- `Pending Units`
-- `Blocked Units`
+- `Phase Candidates`
+- `Generated Delivery Specs` (one per phase)
+- `Current Candidate`
+- `Completed Candidates`
+- `Pending Candidates`
+- `Blocked Candidates`
 - `Dependency Notes`
 - `Repo Boundaries`
 - `Deferred Findings / Future Work`
 - `User Decisions Needed`
 
-The ledger may live in chat during short runs, but long factory runs should use
-a durable repo-local artifact when a convention is obvious.
+This production section is part of the run's one ledger file
+([loop](loop.md#ledger-file)); never keep it only in chat.
 
-## Unit Selection
+## Candidate Selection
 
-Select one delivery-sized unit at a time using this priority:
+Select one phase candidate at a time using this priority:
 
 1. explicit user instruction
 2. first unblocked roadmap unit
-3. next dependency-unblocked slice or epic
+3. next dependency-unblocked milestone, stage, or epic
 4. largest coherent batch that can produce a meaningful checkpoint without crossing a concrete split boundary
 
-A delivery-sized unit should have:
+A phase candidate should have:
 
 - a coherent outcome
 - one primary repo or a clearly justified cross-repo boundary
@@ -65,11 +66,11 @@ A delivery-sized unit should have:
 
 ## Split Or Compile
 
-Production should batch by default after the implementation pattern is known. If one slice has established the route, data model, API shape, test pattern, migration pattern, or doc pattern, group the remaining homogeneous requirements into the next delivery-sized unit instead of creating a long sequence of tiny units.
+Production should batch by default after the implementation pattern is known. If one phase has established the route, data model, API shape, test pattern, migration pattern, or doc pattern, group the remaining homogeneous requirements into the next phase candidate instead of creating a long sequence of tiny phases.
 
-If a roadmap unit is too large, split it before delivery. Splitting must be justified by a named boundary, not by the mere presence of multiple checklist items.
+If a roadmap unit is too large for one phase, split it into several candidates before delivery. Splitting must be justified by a named boundary, not by the mere presence of multiple checklist items.
 
-Split when the unit:
+Split when the candidate:
 
 - crosses unrelated repo or service boundaries
 - mixes contracts, migrations, UI, operations, and docs without a convergence
@@ -79,18 +80,18 @@ Split when the unit:
 - would require broad speculative refactoring before useful progress
 - has unresolved product or architecture decisions that would cause later work to be invented
 
-Do not split when the unit:
+Do not split when the candidate:
 
 - repeats an already-proven implementation pattern across files, commands, variants, routes, fixtures, docs, tests, or cases
 - is mostly mechanical propagation with local variations
 - can be validated by one targeted command set plus repo-standard hygiene
 - would make the factory loop mostly planning, closeout, and status text instead of implementation
 
-Compile when the unit is bounded enough for delivery to produce implementation-sized work and broad enough that execution does more work than process.
+Compile when the candidate is bounded enough for delivery to produce implementation-sized work and broad enough that execution does more work than process.
 
 ## Missing Specs
 
-If a unit lacks an executable delivery spec, invoke [$delivery](../../delivery/SKILL.md) to
+If a candidate lacks an executable delivery spec, invoke [$delivery](../../delivery/SKILL.md) to
 create one. Do not ask the user to hand-write implementation planning when the
 goal and roadmap evidence are sufficient.
 
@@ -103,10 +104,10 @@ Ask the user only when:
 
 ## Handoff To Delivery
 
-For each selected unit, hand delivery:
+For each selected candidate, hand delivery one phase (one delivery spec per phase):
 
-- `Unit Name`
-- `Unit Goal`
+- `Phase Name`
+- `Phase Goal`
 - `Vision Boundary`
 - `Source Evidence`
 - `Target Repo(s)`
@@ -116,5 +117,5 @@ For each selected unit, hand delivery:
 - `Checkpoint Target`
 - `Open Questions`
 
-Record the generated delivery spec in the production ledger before loop
-execution begins.
+Record the generated delivery spec in the production section of the ledger
+before loop execution begins.

@@ -19,9 +19,9 @@ Use this when a Rust repository does not already have a hygiene-budget test. Ins
 - `todo!(`
 - `unimplemented!(`
 
-## Required structural checks (test boundary)
+## Structural checks (test boundary)
 
-See `test-boundary-hygiene.md`. These are not optional.
+See `test-boundary-hygiene.md`. These are required when the repo's convention is separate test files (or the user asks for it). In a repo that keeps idiomatic inline `#[cfg(test)] mod tests { ... }` modules, skip the structural checks below and instead scope the banned-pattern scan to non-test code (strip `#[cfg(test)]` blocks), recording that choice.
 
 - `MAX_INLINE_TEST_MODULES = 0` — no `#[cfg(test)] mod tests { ... }` with inline bodies in `src/**/*.rs` (excluding `*_test.rs` / `*.test.rs`).
 - `MAX_TEST_ATTR_IN_PRODUCTION = 0` — no `#[test]` or `#[tokio::test]` in production files.
@@ -34,9 +34,10 @@ mod tests;
 ```
 
 When scanning banned-pattern budgets (`.unwrap()`, `panic!(`, etc.), count **production
-code only**. Dedicated companion test files are excluded. Inline test blocks in
-production files are boundary violations — move them out; do not exclude them from
-the structural ratchet or treat them as acceptable production debt.
+code only**. Dedicated companion test files are excluded. Where the separate-files
+convention applies, inline test blocks in production files are boundary violations
+— move them out; do not exclude them from the structural ratchet or treat them as
+acceptable production debt.
 
 **Detection helper:**
 

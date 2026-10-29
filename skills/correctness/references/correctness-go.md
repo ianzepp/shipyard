@@ -129,9 +129,9 @@ If the project has a hygiene ratchet test, your fixes must account for its budge
 
 ### Test verification
 
-After fixing, run the full test suite (`go test ./...`).
-- Also run `go vet ./...`.
-- Run `go test -race ./...` when concurrency is in play.
+After fixing, run the narrowest test scope that proves the change (`go test ./path/to/pkg`), and widen when the change crosses packages.
+- Also run `go vet` on the same packages.
+- Run with `-race` when concurrency is in play.
 - Match the repo's colocated `*_test.go` convention.
 
 ## What You Do NOT Do

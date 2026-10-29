@@ -14,7 +14,7 @@ Focus: **pre-implementation blast radius and downstream pressure**. It does not 
 | Skill | Direction | Question |
 | --- | --- | --- |
 | `consequences` | Forward | If this change lands, what else moves or breaks? |
-| root-cause diagnosis | Backward | What caused the observed failure? (read-only, pre-fix) |
+| diagnosing a failure | Backward | What caused the observed failure? Reproduce, trace, and find the cause read-only before any fix. |
 | `correctness` | Present code | Does existing behavior fail? |
 | `big-bang` | Futures | What paths and tradeoffs exist before choosing one? |
 
@@ -34,7 +34,7 @@ Typical artifacts: PRs; design docs; refactor/migration plans; schema or API con
 
 Do not use for:
 
-- diagnosing an already observed failure → root-cause diagnosis
+- diagnosing an already observed failure → diagnose the failure read-only first (reproduce, trace, find the cause)
 - implementing the change
 - style, readability, or structural cleanup → `cleanliness`
 - broad futures exploration → `big-bang`
@@ -130,6 +130,6 @@ Look for: forgotten implementation steps; implied migrations/backfills; compatib
 | Proposal ready to implement | `delivery`, direct implementation, or `factory` |
 | Fuzzy goal needs grounding | `goal-forge` |
 | Multi-track coordination needed | `campaign` |
-| Observed failure needs diagnosis | root-cause diagnosis |
-| Structural fix needed in existing code | `correctness` or scoped implementation |
+| Observed failure needs diagnosis | Diagnose the failure read-only first (reproduce, trace, find the cause) |
+| Structural fix needed in existing code | `cleanliness` |
 | Intentional compatibility removal | Remove the stale compatibility paths instead of keeping aliases |

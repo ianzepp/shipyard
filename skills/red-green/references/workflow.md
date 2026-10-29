@@ -8,7 +8,7 @@ Build a factual baseline before changing code.
 
 | Mode | Scope |
 | --- | --- |
-| Broad | Map the subsystem or repo slice; identify broad blind spots |
+| Broad | Map the subsystem or package; identify broad blind spots |
 | Incremental | Map the changed surface and immediate neighboring tests and modules |
 
 Check: test runners and coverage tooling; which packages/modules/directories have tests; untested or weak critical paths; whether existing coverage data is current enough to trust.
@@ -44,7 +44,7 @@ Each worker must:
 - add aggressive unit coverage for happy, sad, and edge cases
 - prefer small deterministic fixtures over broad integration setup
 - note assumptions inline when behavior is ambiguous
-- not run tests
+- not run tests (standalone; inside factory the tests are run at slice sign-off, see `SKILL.md`)
 
 Target cases: success paths; invalid inputs; boundary values; nil/null handling; empty collections; ordering sensitivity; error propagation; retry, timeout, or fallback logic when locally unit-testable.
 
@@ -58,13 +58,13 @@ Rules:
 - verify against implementation contract and stated target surface
 - in Incremental mode, keep verification local unless drift was introduced
 - record findings and repairs as `Wave 2 Audit Notes`
-- do not run tests
+- do not run tests (standalone; inside factory see `SKILL.md`)
 
 These agents must: verify tests match the implementation contract; catch invented behavior, brittle assertions, unreachable setup; tighten naming and case structure; fix obviously wrong or malformed tests.
 
 ## 5. Run Tests And Record Failures
 
-After both writing passes, run relevant tests in this order:
+After both writing passes, run relevant tests. Inside factory, each slice's tests are run at its sign-off instead, with the `red_first` record kept in the ledger ([slice runner](../../factory/references/loop.md#running-a-slice-list)). For new behavior or a bug fix, run the new test first against the unfixed code and record that it fails for the right reason (the missing behavior or the bug itself). If it passes, or fails for another reason, the test is wrong: fix the test before touching the implementation. Then apply the fix and run in this order:
 
 1. targeted tests for newly changed surfaces
 2. adjacent package or module tests if cheap
@@ -75,7 +75,7 @@ After both writing passes, run relevant tests in this order:
 | Broad | From targeted runs to broader subsystem or suite |
 | Incremental | Only as far as risk profile justifies |
 
-Record as `Failure Ledger`: command run; pass/fail; whether failures were pre-existing, newly introduced, or ambiguous. Do not collapse failures into one bucket.
+Record as `Failure Ledger`: command run; the red result observed before the fix and why it failed; pass/fail; whether failures were pre-existing, newly introduced, or ambiguous. Do not collapse failures into one bucket.
 
 ## 6. Loop Until Honestly Resolved
 
@@ -99,7 +99,7 @@ Every iteration updates `Failure Ledger` with: failing test or suite; classifica
 | 1 | Worker agents write tests for disjoint owned surfaces |
 | 2 | Separate agents verify Wave 1 outputs and repair tests without executing them |
 
-Do not use the same agent for authorship and verification of the same surface unless delegation is unavailable. Scale delegation to the mode and ownership map.
+Do not use the same agent for authorship and verification of the same surface unless delegation is unavailable. Without delegation, run Wave 2 as a self-contained cold pass: set aside your authoring notes, re-read the tests against the implementation contract and target surface only, and report `Evaluator mode: self-contained cold pass` in `Wave 2 Audit Notes`. Scale delegation to the mode and ownership map.
 
 ## Triage Standard
 

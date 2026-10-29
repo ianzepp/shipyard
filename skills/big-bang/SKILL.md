@@ -158,7 +158,7 @@ Invoke `delivery` when:
 - the user has selected a branch or asks to turn one branch into an
   implementation plan
 - acceptance criteria can be stated
-- the next artifact should be a normalized spec, repo-aware baseline, stage
+- the next artifact should be a normalized spec, repo-aware baseline, unit
   graph, workstreams, checkpoints, and gate plan
 
 Invoke `factory` when:
@@ -166,7 +166,8 @@ Invoke `factory` when:
 - the user asks to execute, keep going autonomously, or run the phase set
 - there is a durable phase list or lifecycle tree
 - each phase can have a delivery spec, checkpoint target, validation policy,
-  and commit boundary
+  and commit unit (per-slice by default; see factory
+  [Commits](../factory/SKILL.md#commits))
 - the work should continue across many turns or compaction cycles without
   restarting the idea discovery process
 
@@ -177,7 +178,7 @@ When handing off to factory, prepare a compact factory-ready bundle:
 - `Target Workspace`
 - `Delivery Spec Directory`
 - `Checkpoint Policy`
-- `Commit Policy`
+- `Commit Unit`
 - `Completed Big Bang Artifacts`
 - `Open Questions`
 - `Stop Or Escalation Conditions`
@@ -251,7 +252,8 @@ For long runs:
 
 Stop expanding and recommend a handoff when:
 
-- one branch clearly dominates and is ready for delivery planning
+- one branch clearly dominates and is ready for a goal document (`goal-forge`)
+  or for delivery planning
 - a branch has a phase set that is ready for factory execution
 - the next question requires external research or expert review
 - the corpus is coherent enough for another model to warm up cold
@@ -274,6 +276,6 @@ Use this default response shape:
    when the run is deeper than Spark
 6. `Next Redirects` - 1-3 questions or artifact moves that can drive the next
    loop
-7. `Handoff Read` - stay in Big Bang, invoke delivery, or invoke factory
+7. `Handoff Read` - stay in Big Bang, invoke goal-forge, invoke delivery, or invoke factory
 
 Keep the output compact enough that the user can redirect easily.

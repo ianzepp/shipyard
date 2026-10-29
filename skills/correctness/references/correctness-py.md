@@ -135,7 +135,7 @@ If the project has a hygiene ratchet test, your fixes must account for its budge
 
 ### Test verification
 
-After fixing, run the full test suite (`pytest` or the project-configured equivalent).
+After fixing, run the narrowest test scope that proves the change (`pytest path/to/test_file.py` or the project-configured equivalent), and widen when the change crosses packages.
 - Also run the type checker if configured.
 - Match the repo's colocated or `tests/` convention.
 

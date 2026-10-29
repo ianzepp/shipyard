@@ -17,7 +17,7 @@ Is this goal, roadmap, or vision packet grounded enough for factory execution?
 
 Inputs can include:
 
-- `GOAL.md`, PRDs, design docs, roadmap docs, slice plans, issues, transcripts,
+- `GOAL.md`, PRDs, design docs, roadmap docs, milestone lists, issues, transcripts,
   or explicit user instructions
 - repo state, tests, generated docs, schemas, logs, or other evidence
 - prior delivery specs or factory ledgers
@@ -33,8 +33,8 @@ Extract and record:
   rules that must remain true
 - `Acceptance Signals`: how completion can be recognized
 - `Stop Conditions`: what should force factory to pause
-- `Initial Production Inputs`: roadmap units, slices, epics, milestones, or
-  first useful implementation targets
+- `Initial Production Inputs`: roadmap units, milestones, campaign stages,
+  epics, or first useful implementation targets
 
 Classify gaps:
 
@@ -44,12 +44,13 @@ Classify gaps:
 
 ## Gate
 
-Proceed to [$production](production.md) only when:
+Proceed to [production](production.md) only when:
 
 - the goal boundary is clear enough to prevent hidden scope invention
 - at least one production input or first useful milestone exists
 - acceptance signals and stop conditions are concrete enough for review
-- blocking gaps have been surfaced to the user
+- every blocking gap is resolved, or the user has explicitly accepted
+  proceeding with each one named (record them in the ledger)
 
 If the goal is not ready, pause and recommend goal-forge with the exact missing
 problem-lock fields. Do not use factory to discover the user's real goal while

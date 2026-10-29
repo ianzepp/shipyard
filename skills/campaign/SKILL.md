@@ -30,6 +30,14 @@ repository rules, or user reserves an approval gate. Production changes,
 deployments, payments, credential use, destructive data changes, and outbound
 effects still require their stated authority.
 
+State lives in files. The default campaign artifact is `CAMPAIGN.md` (or
+`<name>.campaign.md`) at the repo root or the repo's docs directory; a repo's
+own convention wins. Record the path used.
+Commit the artifact when it is written or approved, as `docs(plan): <name>`,
+following the user's commit unit (see factory
+[Commits](../factory/SKILL.md#commits)). Factory keeps one ledger for the run
+beside it (`<campaign-stem>.ledger.md`).
+
 ## Ground Truth
 
 Read the campaign and its authoritative sources, then verify important status
@@ -75,7 +83,7 @@ rereading every source document. Use repository vocabulary, but include:
 
 For each stage, record its status, source, dependency or gate, and whether it
 lowers to `delivery`, `factory`, or both in sequence. Name the complete target
-slice. For implementation-heavy work, state whether homogeneous successors
+stage scope. For implementation-heavy work, state whether homogeneous successors
 should batch, which concrete boundary permits splitting, or whether one
 discovery unit must establish the pattern first.
 
@@ -88,15 +96,18 @@ embed factory tasks in the top-level artifact.
 2. Reconstruct the admitted scope and desired end state.
 3. Verify completed stages and gates from live evidence.
 4. Select the first incomplete, unblocked stage.
-5. Preserve its coherent delivery slice unless evidence identifies a real
-   dependency, risk, ownership, validation, migration, or external-effect
-   boundary.
-6. If it needs a repo-aware spec, lower the whole slice through `delivery`.
+5. Preserve the stage as one coherent outcome unless evidence identifies
+   a real dependency, risk, ownership, validation, migration, or
+   external-effect boundary.
+6. If it needs a repo-aware spec, lower the whole stage through `delivery`
+   (one spec per factory phase).
 7. If it is execution-ready and authorized, lower it through `factory` or the
    named task-specific process.
 8. Validate the stage with the strongest honest stage-scoped evidence.
-9. Update the campaign and owning goal status immediately with evidence,
-   routing changes, blocked work, and the next stage.
+9. Update the campaign and the owning goal's `## Status` section immediately
+   with evidence, routing changes, blocked work, and the next stage. These
+   status edits are bookkeeping: commit them with the stage's work or as
+   `chore(ledger): <event>` under the user's commit unit.
 10. Continue while the next stage is clear, safe, and authorized.
 
 Research and documentation campaigns may produce artifacts and run gates
@@ -113,6 +124,10 @@ Do not call the campaign complete because the artifact is coherent, a next
 stage is named, a delivery spec exists, or partial tests pass. Complete only
 when every admitted item is implemented and verified and the desired end state
 and closeout gates are achieved, or the user explicitly amends the contract.
+An audit is due at campaign completion (see factory
+[After Audit](../factory/SKILL.md#after-audit)), and any open
+independent-review item blocks closeout unless the user accepts it by name,
+recorded in the ledger.
 
 In draft mode, report whether the artifact has a stage ready for `delivery`, a
 stage ready for `factory`, routing only, or missing discovery. In run mode,

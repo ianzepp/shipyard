@@ -7,6 +7,10 @@ description: Disciplined per-file improvement loop with a subtractive bias — c
 
 One primary source file per iteration. Supporting edits only when directly coupled: tests, fixtures, helpers, technical docs. Source comments and file-level documentation belong to the primary file, not the supporting-doc allowance. If work escapes this boundary → stop, report.
 
+**Polish runs on committed work only.** Run it after a [factory](../factory/SKILL.md) phase gate passes (see its [order](../factory/SKILL.md#order)), or on files the user names. Its commits contain only polish. If a target file has uncommitted changes that you did not make (the user or another process), stop and report; never fold them into a polish commit. In `user-commits` mode, run polish only after the user has committed the phase; polish then stages one file at a time and reports, and the user commits.
+
+**Git safety.** Never `reset --hard`, `checkout -- .`, `restore` over others' work, `clean`, `stash`, `rebase`, amend a landed commit, or force-push. Never discard changes you did not make. Fix forward with new commits.
+
 ## File list
 
 | Rule | Action |
@@ -27,17 +31,20 @@ One primary source file per iteration. Supporting edits only when directly coupl
 
 | # | Step | Gate |
 |---|---|---|
+| 0 | Confirm the file's changes are committed and none are foreign | Clean target; else stop and report |
 | 1 | Read file + nearby tests + related docs + surrounding context | Understand contract |
 | 2 | `correctness` → behavioral bugs, invariant breaks, race risks, data-loss risks | No silent regressions |
-| 3 | `cleanliness` → **subtractive first**: what can leave (dead code, redundant abstraction, fields/imports/helpers with no user)? Then naming, structure, complexity. No behavior change | Local maintainability ↑; every survivor defended |
-| 4 | `housekeeping` → stale patterns, test/production boundary, repo convention drift | Hygiene aligned |
+| 3 | `cleanliness` lens applied to this one file → **subtractive first**: what can leave (dead code, redundant abstraction, fields/imports/helpers with no user)? Then naming, structure, complexity. No behavior change; aesthetic-only churn is not a reason to edit | Local maintainability ↑; every survivor defended |
+| 4 | `housekeeping` lens → stale patterns, test/production boundary (per the repo's convention), repo convention drift | Hygiene aligned |
 | 5 | Create/update directly matching tests | Useful coverage for changed behavior |
 | 6 | Review source presentation under repository policy; update directly related technical docs | Charter/rationale/contract not stale or invented |
 | 7 | Targeted validation only: file + related tests | Short explicit timeout; no full suite |
 | 8 | Review diff for scope; keep only this unit's changes | No leak to other files |
-| 9 | Commit cohesive change | Continue to next file |
+| 9 | Commit cohesive change (polish only) | Continue to next file |
 
 No useful change → record inspected, skip. No forced commit.
+
+**A bug found in step 2 is not a polish edit.** Stop work on that file, record the finding, and route it to [slicer](../slicer/SKILL.md#modes) rework mode (a) as a repair slice. When polish runs inside [factory](../factory/SKILL.md), factory runs that repair slice through sign-off and the phase gate (see its [phase gate](../factory/references/loop.md#phase-gate)); standalone, report the finding to the user. Polish commits stay polish-only; never mix a fix into one.
 
 ## Design taste
 
@@ -92,7 +99,7 @@ or general-concept document remains outside the one-file boundary.
 
 ## Commit rule
 
-Commit after each changed primary file. Include: primary + supporting tests, fixtures, helpers, docs.
+Commit after each changed primary file. Include: primary + supporting tests, fixtures, helpers, docs. In `user-commits` mode, stage the primary and supporting files for that one file, report, and let the user commit before moving to the next file.
 
 | Element | Format |
 |---|---|
@@ -101,15 +108,15 @@ Commit after each changed primary file. Include: primary + supporting tests, fix
 | Primary trailer | `Polish-Primary: src/parser/nodes.rs` (exactly one) |
 | Supporting trailer | `Polish-Supporting: path/to/file` (optional) |
 
-Lock-producing git: serialize within the repo.
+Path-limited staging: stage only the primary file and its supporting files. Lock-producing git: serialize within the repo.
 
 ## Reporting candidates
 
-`scripts/suggest-polish-files.py` ranks tracked files by churn since last recognized polish commit. Script paths below are relative to this skill's directory; `--repo` points at the repository being polished:
+`scripts/suggest-polish-files.py` ranks tracked files by churn since last recognized polish commit. `<skill-dir>` is where this skill is installed (for the Claude Code plugin, `${CLAUDE_PLUGIN_ROOT}/skills/polish`); `<repo-root>` is the repository being polished:
 
 ```bash
-python3 scripts/suggest-polish-files.py --repo .
-python3 scripts/suggest-polish-files.py --repo . --json --limit 15
+python3 <skill-dir>/scripts/suggest-polish-files.py --repo <repo-root>
+python3 <skill-dir>/scripts/suggest-polish-files.py --repo <repo-root> --json --limit 15
 ```
 
 Recognized: `polish(scope):…`, legacy `Polish …`, reversed `<scope>: polish …`, any commit with `Polish-Primary:` trailer. Score = routing suggestion, not quality verdict.
@@ -117,11 +124,11 @@ Recognized: `polish(scope):…`, legacy `Polish …`, reversed `<scope>: polish 
 Exclude generated or unpolishable files with a repo-root `.polishignore` (gitignore-style globs, `#` comments, blank lines) or repeatable `--exclude <glob>` flags. Excluded files are dropped from candidates entirely and counted in the stderr summary.
 
 For Rust repositories, the cleanliness-owned structural census is an optional
-companion:
+companion (`<skills-root>` is the directory holding the installed skills; point `--path` at the source root):
 
 ```bash
-python3 ../cleanliness/scripts/rust-structure-census.py \
-  --repo . --path crates --limit 30
+python3 <skills-root>/cleanliness/scripts/rust-structure-census.py \
+  --repo <repo-root> --path <source-root> --limit 30
 ```
 
 Keep the signals separate. `suggest-polish-files.py` measures churn since
@@ -138,23 +145,23 @@ Run the analyzer after a large merge to pick candidates, then polish them one fi
 When a file is inspected through the full per-file loop and found clean (no changes needed, no commit), record it so the analyzer does not flag it again:
 
 ```bash
-python3 scripts/polish-inspected.py \
-  --repo . --files src/foo.rs src/bar.py
+python3 <skill-dir>/scripts/polish-inspected.py \
+  --repo <repo-root> --files src/foo.rs src/bar.py
 ```
 
 This creates or updates `.polish-inspected.json` in the repo root. `suggest-polish-files.py` auto-detects this file and suppresses entries whose inspection timestamp is newer than the file's last git modification.
 
 **Prune stale entries** (removes files modified after inspection):
 ```bash
-python3 scripts/polish-inspected.py --repo . --prune
+python3 <skill-dir>/scripts/polish-inspected.py --repo <repo-root> --prune
 ```
 
 **List current inspections:**
 ```bash
-python3 scripts/polish-inspected.py --repo . --list
+python3 <skill-dir>/scripts/polish-inspected.py --repo <repo-root> --list
 ```
 
-Whoever runs the pass **must** record every file it inspects and finds clean during a polish pass.  Commit the `.polish-inspected.json` file alongside the polish commits from that pass.
+Whoever runs the pass **must** record every file it inspects and finds clean during a polish pass. `.polish-inspected.json` is a polish artifact, so it stays within the polish-only rule. Commit it with the pass's last polish commit; when the pass makes no other polish commit, commit it alone as `polish: record inspected files` (no `Polish-Primary:` trailer). In `user-commits` mode, stage it and report.
 
 ## Progress reporting
 
@@ -167,5 +174,5 @@ Whoever runs the pass **must** record every file it inspects and finds clean dur
 
 **Loop:** skip correctness for cleanliness, defer tests past commit, run full suite per file, force commit on unchanged file, polish files outside the bounded list, scope leak to unrelated files, silent test broadening, delete code whose load-bearing purpose is unconfirmed.
 **Source presentation:** narrate code, demand comments for every survivor, invent rationale or history, copy changing inventories into prose, rewrite cross-module charters inside one file's loop.
-**Commit:** omit `Polish-Primary:` trailer, `polish` type on non-polish commits, parallel git during file loop, mixed-scope commits spanning multiple primary files.
+**Commit:** omit `Polish-Primary:` trailer on a primary-file commit, fold a bug fix into a polish commit, `polish` type on non-polish commits, parallel git during file loop, mixed-scope commits spanning multiple primary files.
 **Reporting:** skip per-file progress, treat `suggest-polish-files.py` score as quality gate.

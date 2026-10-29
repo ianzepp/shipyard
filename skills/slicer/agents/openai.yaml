@@ -1,4 +1,4 @@
 interface:
   display_name: "Slicer"
   short_description: "Cut an approved plan into small, disjoint, self-contained slices"
-  default_prompt: "Use $slicer to re-read the code and cut one approved plan into slices with self-contained briefs, exact write scopes, tests, and a dependency graph. Save the slice list next to the plan; write no code."
+  default_prompt: "Use $slicer to re-read the code and cut one approved plan (one spec, one phase) into slices with self-contained briefs, exact write scopes, tests, red_first flags, a dependency graph, and a final tidy slice. Save the slice list next to the plan; write no code."

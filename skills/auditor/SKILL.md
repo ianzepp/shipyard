@@ -24,6 +24,7 @@ residual blind spots are explicit.
 | Code and integration audit | Auditor + this skill |
 | Findings and verdict | Auditor |
 | What to do with the findings (fix, accept, defer, merge) | The person or agent that asked for the audit |
+| Committing the report file and writing the ledger | The requester (in a factory run, factory) |
 | Requirement-completion reconstruction | [poker-face](../poker-face/SKILL.md) patterns |
 | Language-specific behavioral bug patterns | [correctness](../correctness/SKILL.md) references |
 
@@ -31,10 +32,42 @@ Audit for risk signals, sampled review, or when evidence is insufficient to
 accept a change. Do not turn the audit into a universal review gate for every
 completed task.
 
+Audits are due at goal or campaign completion, at release gates, on risk
+signals (auth, permissions, data migration, persistence, concurrency, public
+API or schema change, security-sensitive input), or when the user asks; they
+are optional per phase otherwise. In a factory run the audit reviews a
+committed range, so the range can be frozen. What happens to the verdict is
+described in factory's [After Audit](../factory/SKILL.md#after-audit).
+
+## Independence
+
+When the agent auditing also wrote or supervised the change, say so: report
+`Evaluator mode: self-audit`. A self-audit follows two extra rules.
+
+- Reconstruct the requirements from the plan and the diff before reading any
+  summary, commit message, or ledger entry. Those are claims, not the target.
+- `clean_pass` is not available for a change that touches auth, permissions,
+  tenancy, data migration, persistence formats, or security-sensitive input,
+  unless a separate reviewer (another agent or model, or the user) signs off.
+  The best self-audit verdict there is `residual`, with an "independent review
+  required" item naming those surfaces.
+
+An "independent review required" item (and the "independent security review
+required" item under Audit Lenses) is `blocking-later`: it blocks release gates
+and goal or campaign closeout until the review is done. Closeout cannot happen
+with one open unless the user accepts it by name, and factory records that in
+the ledger. See factory's
+[Verdicts and Severity](../factory/SKILL.md#verdicts-and-severity).
+
+An audit by an agent that did not write or supervise the change reports
+`Evaluator mode: independent`.
+
 ## Hard Rules
 
 1. **Read-only product scope.** Do not edit source, tests, config, docs,
-   dependencies, generated files, or Git state. Builds and tests may create
+   dependencies, generated files, or Git state. The one exception is your own
+   report file (see Reporting): write it and nothing else. You do not commit
+   it or write the ledger; the requester does. Builds and tests may create
    normal artifacts; never clean or revert them to disguise mutation.
 2. **Freeze identity before review.** Record repository, assignment or request,
    base SHA, head SHA, paths, requirements, exclusions, and risk reason. An
@@ -103,9 +136,17 @@ The audit sequence is fixed:
 Load the relevant [correctness](../correctness/SKILL.md) language reference
 for substantive source review. Use [poker-face](../poker-face/SKILL.md)
 audit-packet patterns when the assignment includes a delivery spec or done-when.
-For security-sensitive changes, run a dedicated security review rather than
-performing security theater. Treat performance-only opportunities as separate
-work; availability or deadlock defects remain correctness findings.
+For security-sensitive changes, do the security checks in the Security /
+privacy row yourself: authorization enforced at the authoritative boundary,
+tenant and resource ownership on reads and writes, injection and SSRF paths
+from untrusted input, secrets in code or logs, webhook authenticity and
+replay, and new dependency lifecycle hooks. Anything deeper (threat modeling,
+exploit development, cryptographic design review, penetration testing) is out
+of the auditor's reach: report `residual` with an "independent security review
+required" item naming the exact surfaces, and let the user arrange it. Never
+issue `clean_pass` for those surfaces without that review. Treat
+performance-only opportunities as separate work; availability or deadlock
+defects remain correctness findings.
 
 ## Verdict Contract
 
@@ -137,6 +178,7 @@ scope:
   reviewed: [<paths and affected boundaries>]
   excluded: [<explicit exclusions with reason>]
 risk: <low|medium|high|critical> - <reason>
+evaluator_mode: independent | self-audit
 verdict: clean_pass | residual | block_ship
 verdict_basis: <severity, coverage, validation, blind-spot rationale>
 findings:
@@ -165,14 +207,23 @@ blind spots, and `not_claimed`.
 
 ## Reporting
 
-Return the report to whoever asked for the audit. When the repo has a
-convention for review artifacts, also save it as a file next to the work. If
-the report cannot be delivered, say so rather than implying the audit
-completed.
+Return the report to whoever asked for the audit, and save it as a file. This
+is the only file you write. A repo's own convention for review artifacts wins;
+otherwise the default is `<goal-or-campaign-stem>.audit.md` next to the goal or
+campaign file, or `audits/<base>..<head>.md` (short SHAs) for an ad-hoc range.
+The requester commits the report as `docs(audit): <range>` and records its
+path and the verdict in the ledger. If the report cannot be delivered, say so
+rather than implying the audit completed.
 
-A `block_ship` report is a complete audit. The requester owns the repair; to
-turn findings into repair slices, use the rework mode of
-[slicer](../slicer/SKILL.md).
+A `block_ship` report is a complete audit. The requester owns the repair. The
+hand-off is: `block_ship` → the rework mode of [slicer](../slicer/SKILL.md)
+cuts the findings into repair slices → a repair phase → re-audit the original
+range plus the repairs. A `residual` report hands each finding to the ledger's
+deferred findings, with its owner and done-when; the user decides when. A
+residual finding fixed now goes through the same rework; a re-audit is due if
+the fix touches a risk-signal surface (the list under Role Boundaries). A
+`clean_pass` is recorded in the ledger. See factory's
+[After Audit](../factory/SKILL.md#after-audit).
 
 For an independent second opinion, a second auditor freezes the same range and
 completes the pass without reading the first report. The requester reconciles

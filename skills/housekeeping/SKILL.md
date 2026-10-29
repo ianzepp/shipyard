@@ -5,47 +5,49 @@ description: "Full repository maintenance cycle at major inflection points: mech
 
 # Housekeeping
 
-Full maintenance cycle for **major inflection points**. Run phases in order.
-Commit after each successful phase that changes the tree. Stop and ask the user
+Full maintenance cycle for **major inflection points**. Run steps in order.
+Commit after each successful step that changes the tree. Stop and ask the user
 if a failure is ambiguous or a fix needs product judgment.
 
 | Related | Relationship |
 |---|---|
-| When to run | Run full housekeeping only at **major inflection points** (goal or campaign complete, large merge spanning several features, stage closeout, user ask). Not after every change — cost is about that of a large implementation unit. Prefer **one phase per task** when possible. A mechanical-only pass is Phase 1. |
+| When to run | Run only **between** [factory](../factory/SKILL.md) phases or at goal/campaign closeout (see its [order](../factory/SKILL.md#order)), on a **clean tree** (factory commits its [bookkeeping files](../factory/SKILL.md#commits) as it goes, so the tree is clean between phases), where its pull and its own commits are safe. Other major inflection points: large merge spanning several features, stage closeout, user ask. Not after every change — cost is about that of a large implementation unit. Inside a factory phase, structural cleanup is a tidy slice there, not housekeeping. Prefer **one step per run** when possible. A mechanical-only pass is Step 1. |
 | `$polish` | Deeper per-file quality (test decomposition, missing tests, docs) is `$polish`, not this skill. Housekeeping enforces test **boundaries**; polish improves test **quality**. |
-| Docs | README / documentation truth passes are their own tasks, not phases here. Verify doc claims against live code. |
+| Docs | README / documentation truth passes are their own tasks, not steps here. Verify doc claims against live code. |
 
-Dependency and lockfile policy: [$dependency-policy](references/dependency-policy.md).
+Dependency and lockfile policy: [dependency-policy](references/dependency-policy.md).
+
+**Git safety.** Never `reset --hard`, `checkout -- .`, `restore` over others' work, `clean`, `stash`, `rebase`, amend a landed commit, or force-push. Never discard changes you did not make. Fix forward with new commits. (Step 1 refresh below uses `pull --ff-only` only; it never merges or rebases.)
 
 ## Pipeline Order
 
-| Order | Phase | Notes |
+| Order | Step | Notes |
 |---|---|---|
 | 1 | **Mechanical block** | fmt → lint `--fix` → build/check → generate (if named) → report. **Never tests.** |
-| 2 | **Test boundary hygiene** | Move inline tests out of production files; thin wiring only; structural check |
+| 2 | **Test boundary hygiene** | Only when the repo's convention is separate test files (or the user asks): move inline tests out of production files; thin wiring only; structural check. Otherwise skip, with the reason recorded |
 | 3 | **Banned-pattern ratchet** | Run hygiene against non-test code; reduce or lower budgets, never raise |
 | 4 | **Completion report** | Aggregate mechanical + hygiene results |
 
-**Order matters.** Test boundary hygiene runs **before** the banned-pattern
-ratchet. The hygiene script scopes bans to non-test code; tests living inline
-in production files surface as `expect`/`panic` violations that look like "fix
-these" when the real fix is "move these tests." Never count or ratchet over
-unmigrated inline tests.
+**Order matters.** Where Step 2 applies, test boundary hygiene runs **before**
+the banned-pattern ratchet. The hygiene script scopes bans to non-test code;
+tests living inline in production files surface as `expect`/`panic` violations
+that look like "fix these" when the real fix is "move these tests." Never count
+or ratchet over unmigrated inline tests in such a repo.
 
 | Gate | Rule |
 |---|---|
 | Mechanical stops (dirty tree / judgment / out-of-scope dirt) | Resolve with the user and re-run, or abort the cycle — **do not skip to hygiene on a red build** |
 | Hygiene fails | Narrow hygiene tests only; fix or stop — never weaken the ratchet |
 
-## Phase Summary
+## Step Summary
 
-| # | Phase | Action | Commit |
+| # | Step | Action | Commit |
 |---|---|---|---|
 | **1** | Mechanical block | 1.1 Refresh → 1.2 Orient → 1.3 Verify env → 1.4 Lint `--fix` → 1.5 Build → 1.6 Format → 1.7 Generated → 1.8 Report | `style: format` / `chore: lint --fix` / `chore: regenerate` |
-| **2** | Test boundary hygiene | Extract inline tests to dedicated test files; verify thin wiring only | `test: extract inline tests to dedicated files` |
+| **2** | Test boundary hygiene | When the repo's convention is separate test files (or the user asks): extract inline tests to dedicated test files; verify thin wiring only | `test: extract inline tests to dedicated files` |
 | **3** | Banned-pattern ratchet | Run hygiene; reduce violations; lower budgets (never raise) | `chore: reduce hygiene debt` / `test: add hygiene ratchet` |
 
-A large lint backlog is its own project, not a housekeeping phase.
+A large lint backlog is its own project, not a housekeeping step.
 
 ## Global Rules
 
@@ -57,10 +59,10 @@ A large lint backlog is its own project, not a housekeeping phase.
 | 4 | Monorepos | One named root per task | Cross-repo freestyle |
 | 5 | Caches | — | Delete or mutate caches or environments outside the repo unless the user asks |
 | 6 | Blockers | Stop and ask when: local changes/untracked/merge/rebase in progress; unrelated edits interfere; step unusually expensive/disruptive/ambiguous | Stash automatically; merge or rebase without asking |
-| 7 | Skips | No test harness → skip Phases 2–3 and say so; mechanical already skipped build → do not invent one | Skip the mechanical block and still claim full housekeeping |
-| 8 | Mechanical boundary | Hygiene phases may edit beyond the mechanical freeze only with explicit full-HK scope | Use housekeeping to sneak product refactors |
+| 7 | Skips | No test harness → skip Steps 2–3 and say so; repo convention is inline tests and the user did not ask → skip Step 2 and say so; mechanical already skipped build → do not invent one | Skip the mechanical block and still claim full housekeeping |
+| 8 | Mechanical boundary | Hygiene steps may edit beyond the mechanical freeze only with explicit full-HK scope | Use housekeeping to sneak product refactors |
 
-## Phase 1: Mechanical Block
+## Step 1: Mechanical Block
 
 Mechanical verify / fix / format for a **frozen scope**. Be literal. Do not design products.
 
@@ -69,7 +71,7 @@ architecture judgment → **stop**, report, do not freestyle.
 
 **The mechanical block never runs tests.** Not full suites, not filters, not
 "cheap default `cargo test`," not CI test jobs. Tests belong to the implementer's
-closeout, Phases 2–3 when they choose, auditors, or CI — not the mechanical
+closeout, Steps 2–3 when they choose, auditors, or CI — not the mechanical
 block. Large repos (thousands of tests) make accidental suite runs especially
 costly.
 
@@ -107,7 +109,7 @@ There is **no** test-filter field. Do not accept or invent one.
 | 1 | Worktree | `git rev-parse --show-toplevel` | Exists; matches task root |
 | 2 | Status | `git status --short --branch` | — |
 | 3 | Dirty outside freeze | List paths; **stop** | User decision |
-| 4 | Dirty inside freeze only | Continue (task owns that dirt) | — |
+| 4 | Dirty inside freeze only | Housekeeping runs on a clean tree: stop unless the user says that dirt is theirs and in scope | User decision |
 | 5 | Clean + upstream | `git fetch` → `git pull --ff-only` | Fast-forward OK |
 | 6 | Diverged / pull fails | **Stop**, report | — |
 | 7 | Record | `git log --oneline -1` | HEAD captured |
@@ -134,7 +136,7 @@ Run **verify** only (per language), from the frozen root — **compile/check, no
 | Go | `go build` (not `go test`) |
 | Python | Project env sync only if already standard; then project **check/build** (not pytest) |
 
-Follow [$dependency-policy](references/dependency-policy.md) **clean-environment
+Follow [dependency-policy](references/dependency-policy.md) **clean-environment
 command table** only.
 **Never:** upgrade packages for freshness; weaken locks; invent release-age
 config; run tests "to verify env."
@@ -216,7 +218,7 @@ Otherwise: **stop**, report the residual to the user.
 
 ### Mechanical-only task shape
 
-A task scoped to Phase 1 only is a mechanical-only pass:
+A task scoped to Step 1 only is a mechanical-only pass:
 
 ```text
 Repo: <absolute root>
@@ -227,11 +229,14 @@ Never: tests
 Commit: style:/chore: only on allowed paths
 ```
 
-## Phase 2: Test Boundary Hygiene
+## Step 2: Test Boundary Hygiene
 
-Read [$test-boundary-hygiene](references/test-boundary-hygiene.md) before
-counting or moving anything. The hygiene script scopes bans to non-test code;
-inline tests in production files are a **boundary violation**, not a budget line.
+**When this step applies.** Only when the repo's convention is separate test files (stated in its instructions or evident from its existing layout), or the user asks for it. Idiomatic inline tests (for example Rust `#[cfg(test)] mod tests { ... }`) are not a violation in a repo that uses them: skip this step, record the reason in the report, and have Step 3 scope its bans to non-test code by other means (for example by excluding `#[cfg(test)]` blocks) instead of requiring extraction.
+
+Read [test-boundary-hygiene](references/test-boundary-hygiene.md) before
+counting or moving anything. In a repo that has adopted this convention, the
+hygiene script scopes bans to non-test code and inline tests in production files
+are a **boundary violation**, not a budget line.
 
 | Rule | Do | Never |
 |---|---|---|
@@ -245,27 +250,27 @@ steps in the reference) — mechanical relocation beats retyping. Proof: test
 count before == test count after.
 
 Per-language detection commands: see
-[$test-boundary-hygiene](references/test-boundary-hygiene.md).
+[test-boundary-hygiene](references/test-boundary-hygiene.md).
 
 Commit: `test: extract inline tests to dedicated files`.
 
-## Phase 3: Banned-Pattern Ratchet
+## Step 3: Banned-Pattern Ratchet
 
 | State | Sequence |
 |---|---|
-| **No ratchet** | (1) Test boundary hygiene must be complete → (2) Set each budget to current production-only totals (not arbitrary zero) → (3) Scope scans to production files; exclude dedicated test filenames → (4) Include the required structural inline-test check → (5) Run the new hygiene test → (6) Commit: `test: add hygiene ratchet` |
-| **Ratchet exists** | (1) Run → (2) If tests in production → back to Phase 2, re-run → (3) Reduce production violations; never raise budget → (4) Lower the budget constant when code beats it → (5) Commit: `chore: reduce hygiene debt` or `test: extract inline tests to dedicated files` |
+| **No ratchet** | (1) Where Step 2 applies, test boundary hygiene must be complete → (2) Set each budget to current production-only totals (not arbitrary zero) → (3) Scope scans to production files; exclude dedicated test filenames → (4) Include the required structural inline-test check → (5) Run the new hygiene test → (6) Commit: `test: add hygiene ratchet` |
+| **Ratchet exists** | (1) Run → (2) If Step 2 applies and tests are in production files → back to Step 2, re-run → (3) Reduce production violations; never raise budget → (4) Lower the budget constant when code beats it → (5) Commit: `chore: reduce hygiene debt` or `test: extract inline tests to dedicated files` |
 
-Use bundled references: Rust: [$hygiene-rs](references/hygiene-rs.md), TS/JS:
-[$hygiene-ts](references/hygiene-ts.md), Go: [$hygiene-go](references/hygiene-go.md),
-Python: [$hygiene-py](references/hygiene-py.md).
+Use bundled references: Rust: [hygiene-rs](references/hygiene-rs.md), TS/JS:
+[hygiene-ts](references/hygiene-ts.md), Go: [hygiene-go](references/hygiene-go.md),
+Python: [hygiene-py](references/hygiene-py.md).
 
 **Source file size:** flag production files ~1000+ lines when a natural split
 helps. Not test files. Not intentional dispatcher/orchestrator files.
 
 Skip when there is no practical test harness or the language is unsupported.
 
-## Phase 4: Completion Report
+## Step 4: Completion Report
 
 | Category | Content |
 |---|---|
@@ -283,11 +288,11 @@ Skip when there is no practical test harness or the language is unsupported.
 skipping the 1.1 refresh before judgment edits; raising hygiene budgets;
 deleting tests instead of extracting them.
 
-**Composition:** running Phases 2–3 on a red mechanical build; using full
-housekeeping for routine post-unit fmt (use a Phase 1-only task); treating
+**Composition:** running Steps 2–3 on a red mechanical build; using full
+housekeeping for routine post-unit fmt (use a Step 1-only task); treating
 housekeeping as a license for README research, test-quality passes, or docs
 (those are separate docs tasks or `polish`).
 
-**Phases:** running the banned-pattern ratchet over unmigrated inline tests;
+**Steps:** forcing test extraction on a repo whose convention is inline tests; running the banned-pattern ratchet over unmigrated inline tests in a separate-files repo;
 skipping the structural inline-test ratchet after extraction; repo-wide bug
 hunts; over-engineering decomposition.

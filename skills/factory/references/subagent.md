@@ -52,7 +52,7 @@ Minimum handoff fields:
 - `Verification`: commands or checks the subagent should run when applicable
 - `Escalation`: what should make the subagent stop and report instead of guessing
 
-Do not ask a subagent to infer the plan from the full repository when the parent already knows the relevant slice. Package the slice.
+Do not ask a subagent to infer the plan from the full repository when the parent already knows the relevant scope. Package it; for an implementer, the packet is the slice brief and its write scope.
 
 ## Role Patterns
 
@@ -65,7 +65,9 @@ Required constraints:
 - name the files or directories likely in scope
 - provide acceptance criteria
 - provide the relevant test or verification command
+- when the brief says `red_first: yes`, require the new test to be run and seen failing before the change, with a summary of the failing output in the report (see [Running a Slice List](loop.md#running-a-slice-list))
 - forbid unrelated cleanup
+- forbid commits; the parent commits path-limited after sign-off
 - require a concise summary of changed files and verification performed
 
 ### Investigator
@@ -96,10 +98,10 @@ Use after the spec is satisfied to review implementation quality.
 
 Required constraints:
 
-- identify critical, important, and minor issues separately
+- classify issues on the canonical `P0` / `P1` / `P2` scale ([factory's Verdicts and Severity](../SKILL.md#verdicts-and-severity))
 - focus on bugs, maintainability, security, tests, and project conventions
 - require concrete file/line evidence when possible
-- produce APPROVED or REQUEST_CHANGES
+- produce `PASS` (no `P0` or `P1`; any `P2` becomes a deferred finding) or `FAIL` (any `P0` or `P1`)
 
 ### Verifier
 
@@ -156,7 +158,7 @@ The parent Factory run should verify important outcomes before advancing gates o
 - inspect the actual diff or files when the change matters
 - run or review the named verification commands
 - confirm generated artifacts exist at the expected paths
-- confirm commits were created only when intended
+- confirm the subagent made no commits
 - re-run failed or ambiguous checks in the parent context when necessary
 
 A reviewer subagent can inform a gate, but the parent owns the gate decision.
@@ -212,6 +214,6 @@ Do not put Factory lifecycle rules here. The following belong in Factory's main 
 - correctness mode
 - red-green mode
 - polish closeout policy
-- commit policy
+- commit unit and bookkeeping commits
 - compaction recovery
 - final Factory reporting

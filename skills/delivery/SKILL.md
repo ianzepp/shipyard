@@ -7,7 +7,9 @@ description: Turn one bounded but messy unit of work into a durable, repo-aware 
 
 Delivery compiles one coherent outcome into a specification that `factory` can
 execute. It inspects and plans, but does not implement, verify product behavior,
-commit, or run the factory lifecycle.
+commit product changes, or run the factory lifecycle. It commits only its own
+spec artifact, as `docs(plan): <name>`, following the user's commit unit (see
+factory [Commits](../factory/SKILL.md#commits)).
 
 Use `campaign` first when several tracks need one routing contract. Skip
 delivery when the work is already implementation-ready and the user wants a
@@ -17,7 +19,8 @@ simple scoped change rather than a planned factory run.
 
 A delivery specification must:
 
-- preserve all scope admitted by its campaign stage;
+- preserve all scope admitted by its input: a campaign stage or a goal
+  artifact (`goal-forge` output, ideally `READY` from `goal-check`);
 - resolve requirements against the live repository;
 - separate evidence, inference, and unresolved decisions;
 - identify implementation units that start with a named edit rather than more
@@ -33,7 +36,7 @@ discovery unit followed by explicit successors.
 
 ## Planning Pipeline
 
-Run these stages in order and preserve each stage's output for the next:
+Run these steps in order and preserve each step's output for the next:
 
 1. **Interpret.** Identify the intended outcome, explicit requirements,
    constraints, non-goals, contradictions, and unresolved decisions.
@@ -42,7 +45,7 @@ Run these stages in order and preserve each stage's output for the next:
 3. **Resolve against the repo.** Inspect current code, tests, configuration,
    history, ownership boundaries, migrations, deployment shape, and relevant
    conventions. Treat docs as claims until corroborated.
-4. **Lower to a stage graph.** Define implementation units, dependencies, and
+4. **Lower to a unit graph.** Define implementation units, dependencies, and
    integration points.
 5. **Assign implementation work.** Give each unit a bounded write scope,
    named edit, done-when condition, and narrow sanity check when useful.
@@ -54,20 +57,22 @@ decisions.
 
 ## Unit Sizing
 
-Keep one specification for one coherent outcome. That outcome may require many
-implementation units.
+Keep one specification for one coherent outcome, and by default one
+specification for one factory phase. That outcome may require many
+implementation units. A goal that needs several phases gets one spec (and one
+slice file) per phase.
 
 One implementation unit is one logical change:
 
 - one behavior family on one primary surface, with matching tests when useful;
-- small enough to implement and commit without owning project-wide gates;
+- small enough to implement and verify without owning project-wide gates;
 - large enough that its process overhead does not exceed the change;
 - independently integrable, or paired with an explicit merge gate when atomic
   landing is required.
 
 Do not put a clean break, all callers, all documentation, and the full suite on
-one implementer. Do not create five-line units whose task descriptions are larger than
-their code. Batch homogeneous work into the same specification, not
+one implementer. Do not create five-line units whose task descriptions are
+larger than their code. Batch homogeneous work into the same specification, not
 automatically into the same worker.
 
 Prefer parallel work only when write surfaces and dependencies are genuinely
@@ -76,15 +81,16 @@ authority changes need an explicit serialization or integration plan.
 
 ## Artifact
 
-Save the result before implementation. Infer a repository-conventional docs
-path when safe; ask only when destination choice would be material.
+Save the result before implementation. Use the repo's own plans or docs
+convention; by default `docs/plans/<name>.md`. Record the path used. Ask only
+when destination choice would be material.
 
 Include:
 
 1. `Interpreted Unit`
 2. `Normalized Spec`
 3. `Repo-Aware Baseline`
-4. `Stage Graph`
+4. `Unit Graph`
 5. `Implementation Work`
 6. `Checkpoints And Gates`
 7. `Validation`
@@ -93,9 +99,13 @@ Include:
 
 `Review Lenses` names which lens skills the work should run and when:
 [`correctness`](../correctness/SKILL.md), [`cleanliness`](../cleanliness/SKILL.md),
-[`housekeeping`](../housekeeping/SKILL.md), [`consequences`](../consequences/SKILL.md)
-(before risky design or migration changes), and [`poker-face`](../poker-face/SKILL.md)
-(after implementation, against the promised outcome).
+[`housekeeping`](../housekeeping/SKILL.md) (between phases only),
+[`consequences`](../consequences/SKILL.md) (before risky design or migration
+changes), [`red-green`](../red-green/SKILL.md) (for testability and coverage programs;
+failing-test-first proof for ordinary behavior changes is already enforced at
+slice sign-off), and [`poker-face`](../poker-face/SKILL.md)
+(after implementation, against the promised outcome). Factory's
+[order](../factory/SKILL.md#order) sets the order in which they run.
 
 Each implementation assignment should be expressible as a short pointer:
 
@@ -119,9 +129,11 @@ named edit without rediscovering the architecture, every admitted requirement
 remains represented in a mandatory unit or gate, dependencies are explicit,
 and validation honestly proves the intended outcome.
 
-Units stay at the logical-change level. Cutting a unit into self-contained
-implementation slices against the current code is [`slicer`](../slicer/SKILL.md)'s job, done just
-before implementation.
+Units stay at the logical-change level. The next step is
+[`slicer`](../slicer/SKILL.md): it cuts each unit into small self-contained
+slices against the current code, just before implementation. Commits follow
+the user's commit unit (per slice by default); see factory
+[Commits](../factory/SKILL.md#commits).
 
 Finish with a short response pointing to the saved artifact and naming only
 blocking open questions. Do not paste the full specification into chat.

@@ -26,9 +26,11 @@ Global rules:
 
 ## Mode Selection
 
-Inside factory, this is normally an update-and-fix mode because the phase is already in execution. When the user clearly wants read-only diagnosis first, prefer the delivery-level root-cause behavior before entering implementation.
+Inside factory, this is normally an update-and-fix mode because the phase is already in execution. Its fixes run as slices: the analysis feeds [$slicer](../../slicer/SKILL.md) (or rework mode (a) for findings in an existing cut), and each fix lands through [slice sign-off](loop.md#running-a-slice-list), with `red_first: yes` for each bug fix. Do not make ad-hoc edits outside a slice. When the user clearly wants read-only diagnosis first, find the cause read-only before entering implementation.
 
-## Phase 0: Orient
+This update mode is for correctness-mode phases only. The correctness read at slice sign-off stays read-only.
+
+## Step 0: Orient
 
 1. Detect the primary language and toolchain from repository files.
 2. Read repository guidance files first.
@@ -46,9 +48,11 @@ Use tests, grep, and nearby modules to establish how the code is supposed to beh
 
 Fix:
 
-- all critical findings
-- all high findings
+- all critical findings (≈ `P0`)
+- all high findings (≈ `P1`)
 - medium findings only when the fix is clearly correct and surgical
+
+The severity mapping is in [factory's Verdicts and Severity](../SKILL.md#verdicts-and-severity).
 
 Do not widen into cleanup, formatting theater, or architecture refactors unless they are required to make the correctness fix honest.
 
@@ -59,14 +63,14 @@ If a large design problem is the root cause, either:
 
 ## Validate Hard
 
-Run the strongest repo-native validation that matches the changed scope.
+Run the strongest repo-native validation that matches the changed scope. Use the narrowest scope that proves the fix at slice sign-off, and widen at the phase gate and checkpoints (see [Verification scoping](loop.md#verification-scoping)).
 
-Typical defaults:
+Typical defaults, scoped to the touched package or module:
 
-- Rust: `cargo test`, `cargo clippy --all-targets -- -D warnings`
-- TypeScript / JavaScript: project test command, typecheck, and lint when the fix touched typed or runtime boundaries
-- Go: `go test ./...`, `go test -race ./...` when concurrency is in play, `go vet ./...`
-- Python: project test command plus configured type checker or lint when relevant
+- Rust: `cargo test -p <crate>`, `cargo clippy -p <crate> --all-targets -- -D warnings`
+- TypeScript / JavaScript: project test command on the touched files, typecheck, and lint when the fix touched typed or runtime boundaries
+- Go: `go test ./<pkg>/...`, `go test -race ./<pkg>/...` when concurrency is in play, `go vet ./<pkg>/...`
+- Python: project test command on the touched tests, plus configured type checker or lint when relevant
 
 ## Report Back Into Factory
 

@@ -1,5 +1,7 @@
 # Test Boundary Hygiene
 
+**Applies when the repo adopts this convention** (separate test files, stated in its instructions or evident from its existing layout) or the user asks for it. Idiomatic inline tests, such as Rust `#[cfg(test)] mod tests { ... }`, are not a violation in a repo that uses them; skip this reference there, record the reason, and scope banned-pattern scans to non-test code by other means. Go and Python test-file naming is already the language convention.
+
 Production source files and test source files serve different quality bars. Hygiene
 ratchets ban patterns such as `.unwrap()`, `panic!(`, `.ok()`, and `let _ =` in
 **production** code. Those same patterns are normal and acceptable in **dedicated
@@ -14,8 +16,8 @@ modules — housekeeping and hygiene passes miss the boundary:
 - Other sessions discover tests embedded in production files and must manually
   extract them even after a recent housekeeping pass.
 
-**Housekeeping enforces test boundaries in Phase 2 (Test Boundary Hygiene),
-before Phase 3 (Banned-Pattern Ratchet) ever counts budgets.**
+**Where the convention applies, housekeeping enforces test boundaries in Step 2
+(Test Boundary Hygiene), before Step 3 (Banned-Pattern Ratchet) ever counts budgets.**
 
 ## Rules by language
 
@@ -32,7 +34,7 @@ before Phase 3 (Banned-Pattern Ratchet) ever counts budgets.**
 mod tests;
 ```
 
-**Forbidden in production files:**
+**Forbidden in production files (when this convention applies):**
 
 - `#[cfg(test)] mod tests { ... }` with inline test bodies
 - `#[test]`, `#[tokio::test]`, or `#[rstest]` functions defined in the production file
@@ -110,7 +112,7 @@ When scanning production code for banned-pattern budgets:
 
 ## Housekeeping completion gate
 
-Before finishing Phase 3, confirm:
+Before finishing Step 3, in a repo where this convention applies, confirm:
 
 - [ ] No `#[test]` / `describe` / `func Test` / `def test_` in production files
 - [ ] Rust `#[cfg(test)]` in production files is path-only (`#[path = "..."] mod tests;`)

@@ -12,12 +12,14 @@ Ecosystem-specific dependency hygiene. Load during mechanical step 1.3 (environm
 
 ## Clean Environment By Language
 
+Build/check only: this table never runs tests. Clean commands are opt-in (only when the user asks or a stale build is suspected).
+
 | Language | Action |
 | --- | --- |
-| Rust | `cargo clean`, then repo-standard build/test commands |
-| TypeScript / JavaScript | Strict reinstall from lockfile (`npm ci`, `pnpm install --frozen-lockfile`, `yarn install --frozen-lockfile`, `bun install --frozen-lockfile`); remove `node_modules` only when needed |
-| Go | Repo-native dependency refresh; do not clear shared global module caches by default |
-| Python | Sync project-local env (`uv sync`, `poetry install`, `pip install -r requirements.txt`); do not wipe global Python caches |
+| Rust | Repo-standard `cargo check` / `cargo build`. Run `cargo clean` first only when the user asks or a stale build is suspected |
+| TypeScript / JavaScript | Strict reinstall from lockfile (`npm ci`, `pnpm install --frozen-lockfile`, `yarn install --frozen-lockfile`, `bun install --frozen-lockfile`), then the project build; remove `node_modules` only when the user asks or a stale install is suspected |
+| Go | Repo-native dependency refresh, then `go build`; do not clear shared global module caches by default |
+| Python | Sync project-local env (`uv sync`, `poetry install`, `pip install -r requirements.txt`), then the project check/build; do not wipe global Python caches |
 
 ## Release-Age Controls
 

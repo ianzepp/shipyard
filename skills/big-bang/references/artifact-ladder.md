@@ -145,7 +145,7 @@ Good when:
 
 - the work is naturally phase-based
 - each phase has a checkpoint target
-- validation and commit boundaries can be named
+- validation can be named and the commit unit is chosen (per-slice by default)
 - the user wants the process to keep running across turns or compaction cycles
 
 Before handing off, prepare:
@@ -155,6 +155,6 @@ Before handing off, prepare:
 - target workspace
 - delivery spec directory
 - checkpoint policy
-- commit policy
+- commit unit
 - completed Big Bang artifacts
 - unresolved decisions

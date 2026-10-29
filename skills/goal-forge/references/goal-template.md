@@ -1,6 +1,6 @@
 # Goal Template
 
-Use this template for `goal.md`, handoff goals, PRD goal sections, or harness-native goal prep notes.
+Use this template for `GOAL.md`, handoff goals, PRD goal sections, or harness-native goal prep notes.
 
 ```markdown
 # Goal: <short name>
@@ -46,6 +46,13 @@ Before editing, inspect:
 - <Security, data, product, UX, architecture, compatibility, or permission rule.>
 - <Any current repo convention the implementation must preserve.>
 
+## Architecture Direction
+
+- Boundary shape: <the modules, services, or layers involved and where the boundaries sit.>
+- Data and control flow: <how data and control move through them.>
+- Ownership: <which module or service is canonical for each responsibility.>
+- Clean-break choices: <what is removed or replaced rather than kept for compatibility.>
+
 ## Supporting Skills
 
 - `<skill>`: <when the implementing agent should use it>
@@ -53,9 +60,16 @@ Before editing, inspect:
 
 ## Implementation Shape
 
-- Phase 1: <smallest useful slice>
-- Phase 2: <follow-up slice, if known>
+- Milestone 1: <smallest useful milestone>
+- Milestone 2: <follow-up milestone, if known>
 - Later: <deferred work, if useful>
+
+## First Implementation Path
+
+For the first milestone only. Full sequencing belongs to delivery and slicer.
+
+- `<module, file, or service>`: <what changes there first>
+- `<module, file, or service>`: <what follows, if needed to make the first edit>
 
 ## Release Posture
 
@@ -91,6 +105,12 @@ Decision: <included / not included / ask user before implementation>
 - Stop if <assumption/evidence gap/permission boundary>.
 - Stop if <destructive action or production write would be needed>.
 - Stop if <exit strategy decision becomes necessary and was not approved>.
+
+## Status
+
+not started
+
+<Updated by goal-check (readiness verdicts: verdict, evaluator mode, date, gaps), and by factory or campaign as work lands: milestone, commits, validation evidence.>
 ```
 
 Keep the template specific. Delete empty sections only when they genuinely do not apply.

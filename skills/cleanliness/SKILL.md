@@ -1,6 +1,6 @@
 ---
 name: cleanliness
-description: "Shape implementation code for managed complexity and run read-only cleanliness scans: module boundaries, function and file size, dispatch structure, helper extraction, guard clauses, naming consistency, and control-flow complexity. Use when refactoring code structure for maintainability without changing behavior, especially after LLM-generated work, before commits, or during factory housekeeping."
+description: "Shape implementation code for managed complexity and run read-only cleanliness scans: module boundaries, function and file size, dispatch structure, helper extraction, guard clauses, naming consistency, and control-flow complexity. Use when refactoring code structure for maintainability without changing behavior, especially after LLM-generated work, before commits, or as a factory tidy slice."
 ---
 
 # Cleanliness
@@ -15,7 +15,7 @@ Shape code for structural maintainability without changing behavior.
 | `cleanliness` | Is complexity shaped into clear modules, functions, boundaries, control flow, names, and comments? |
 | `housekeeping` | Is the repo hygienic and validated? |
 
-Local readability and aesthetic polish belong to `polish`. `cleanliness` is architectural and structural. In factory, a read-only review runs first during discovery; cleanliness may edit behavior-preserving structure afterward.
+Local readability and aesthetic polish belong to `polish`. `cleanliness` is architectural and structural. In factory, cleanliness edits behavior-preserving structure in the phase's tidy slice (see factory's [order](../factory/SKILL.md#order)).
 
 ## Scanner Mode
 
@@ -52,14 +52,14 @@ than creating competing work.
 
 ### Rust structural census
 
-Use `scripts/rust-structure-census.py` (path shown relative to this skill's directory) to rank tracked Rust source before a
-bounded scanner pass:
+Use `scripts/rust-structure-census.py` to rank tracked Rust source before a
+bounded scanner pass. `<skill-dir>` is where this skill is installed (for the Claude Code plugin, `${CLAUDE_PLUGIN_ROOT}/skills/cleanliness`); `<repo-root>` is the repository; point `--path` at the source root, e.g. `src` or `crates`:
 
 ```bash
-python3 scripts/rust-structure-census.py \
-  --repo . --path crates --limit 30
-python3 scripts/rust-structure-census.py \
-  --repo . --path crates --json --limit 100
+python3 <skill-dir>/scripts/rust-structure-census.py \
+  --repo <repo-root> --path <source-root> --limit 30
+python3 <skill-dir>/scripts/rust-structure-census.py \
+  --repo <repo-root> --path <source-root> --json --limit 100
 ```
 
 The dependency-free scanner reports file and function size, nested-brace depth,
@@ -123,7 +123,7 @@ implement its own findings.
 
 ## Factory Phase Use
 
-Inside [$factory](../factory/SKILL.md), run after implementation, correctness, verification, and read-only review discovery; the phase loop there is the canonical sequence.
+Inside [factory](../factory/SKILL.md), cleanliness runs as the phase's final tidy slice, cut by [slicer](../slicer/SKILL.md) as `<prefix>-tidy` (depends on every other slice, `red_first: no`); factory's [order](../factory/SKILL.md#order) is the canonical sequence. In a tidy slice cleanliness never changes behavior.
 
 Default scope: code changed by the current **factory phase**; immediate local modules needed for coherent boundaries; tests only when test shape is a maintainability risk.
 
@@ -131,10 +131,10 @@ Cleanliness may reshape (behavior-preserving): split along repo boundaries; extr
 
 Cleanliness must not:
 
-- change public behavior without rerunning correctness and verification
+- change public behavior (standalone use may do so only after rerunning correctness and verification; in a tidy slice never: a behavior change found is a finding for slicer rework, not an edit)
 - broaden into unrelated pre-existing architecture debt
-- perform aesthetic-only churn (that is `polish`)
-- remove compatibility paths or deprecated aliases (a separate removal pass owns that)
+- perform aesthetic-only churn (aesthetics belong to `polish`, which applies this lens to one file at a time)
+- remove compatibility paths or deprecated aliases (record each as a deferred finding, or propose a separate slice, to remove the compatibility path)
 - treat every long untouched function as phase-blocking
 
 Structural debt outside the active phase → record under `Deferred Findings / Future Work` with `Type: cleanliness` unless it blocks the checkpoint.
@@ -148,7 +148,7 @@ Structural debt outside the active phase → record under `Deferred Findings / F
 5. **Check signature consistency** — in clearly related function groups, notice arguments that are named, grouped, or ordered differently without a domain reason. Standardize obvious local drift, especially receiver/context/auth/id/options/data ordering, but do not launch a broad API migration just to make every callsite aesthetically uniform.
 6. **Reshape when it helps** — extract around domain concepts; split modules on real ownership boundaries; keep thin facades thin; preserve useful visual repetition when abstraction would hide the pattern.
 7. **Add boundary comments** — module comments stating what belongs here and elsewhere; short `WHY` for non-obvious tradeoffs; no line-by-line narration.
-8. **Verify unchanged behavior** — format and run relevant tests; behavior change → hand to `correctness`.
+8. **Verify unchanged behavior** — format and run relevant tests. A behavior change found: in a tidy slice, record it as a finding for slicer rework; standalone, hand it to `correctness` and rerun checks after.
 
 ## Use Modes
 
@@ -189,6 +189,6 @@ Structural debt outside the active phase → record under `Deferred Findings / F
 
 ## References
 
-- [$examples](references/examples.md) — do/don't patterns, review language, before/after shapes
-- [$rust-generated-code](references/rust-generated-code.md) — Rust and LLM-generated compiler, backend, service, route, or orchestration code
+- [examples](references/examples.md) — do/don't patterns, review language, before/after shapes
+- [rust-generated-code](references/rust-generated-code.md) — Rust and LLM-generated compiler, backend, service, route, or orchestration code
 - [`rust-structure-census.py`](scripts/rust-structure-census.py) — dependency-free Rust structural review-trigger census with table and JSON output

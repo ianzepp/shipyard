@@ -58,6 +58,16 @@ The packet must let another reviewer reproduce the audit:
 Mark unavailable fields as unknown. Do not infer acceptance criteria from the
 implementation when an authoritative target exists.
 
+When you wrote or supervised the change yourself, this is a self-audit:
+report `Evaluator mode: self-audit` and build the intended-behavior checklist
+from the plan and the diff before reading the completion summary, the commit
+messages, or the ledger. A self-audit cannot issue `clean_pass` for auth,
+permissions, tenancy, data migration, persistence formats, or
+security-sensitive input unless a separate reviewer signs off; the "independent
+review required" item that results is `blocking-later` for release gates and
+closeout (see factory's
+[Verdicts and Severity](../../factory/SKILL.md#verdicts-and-severity)).
+
 When the target includes multiple requirements, mark each:
 
 ```text
@@ -117,7 +127,12 @@ language reference for substantive code changes.
 - Verify enforcement at the authoritative boundary, not only in UI or callers.
 - Check tenant/resource ownership on reads and writes.
 - Check idempotency keys, replay behavior, webhook authenticity, and TOCTOU gaps.
-- Escalate deep adversarial work to a dedicated security review, naming the exact surface.
+- Escalate deep adversarial work (threat modeling, exploit development,
+  cryptographic design review, penetration testing) by reporting `residual`
+  with an "independent security review required" item that names the exact
+  surface; the user arranges the review. Do not issue `clean_pass` for that
+  surface without it. The item is `blocking-later` for release gates and
+  closeout.
 
 ### Data and migration safety
 
@@ -209,7 +224,7 @@ boundary merely because the repository documents a command.
 | Low | Diff/static inspection; focused existing tests for changed behavior |
 | Medium | Focused tests plus typecheck/build or equivalent boundary validation |
 | High | Regression and negative-path tests; affected integration suite; schema/config/deploy checks as applicable |
-| Critical | High-risk evidence plus independent security/operational review; no clean pass from source inspection alone |
+| Critical | High-risk evidence; no clean pass from source inspection alone. Also report `residual` with an "independent security review required" item naming the security and operational surfaces; the user arranges that review, and `clean_pass` waits for it |
 
 Select repo-native commands. Do not paste generic commands into an unfamiliar
 toolchain. For each command record:
@@ -256,5 +271,8 @@ findings statement only after coverage and validation are stated. Report what
 was not proven: production behavior, global repository correctness, external
 service behavior, or performance under load unless directly evidenced.
 
-Return the report to the requester. If delivery fails, report the failure;
-do not falsely claim the audit was delivered.
+Save the report as your own report file (path convention in `SKILL.md`,
+Reporting) and return it to the requester, who commits it as
+`docs(audit): <range>` and writes the ledger. That file is the only thing you
+write. If delivery fails, report the failure; do not falsely claim the audit
+was delivered.

@@ -9,7 +9,7 @@ Conversational convergence for **one focused problem** before execution. Lock th
 
 Optional upstream skill. Run when intent is fuzzy and the outcome should be one bounded target — not when several tracks already need a coordination map (use `campaign` instead).
 
-Goal-forge operates at the **architecture and milestone** level. It should answer what needs to exist, which architecture direction is intended, what first useful slice proves the direction, and what decisions remain open. It should not try to become a task-by-task implementation playbook; that stricter handoff belongs to `goal-check`, `delivery`, or `factory`.
+Goal-forge operates at the **architecture and milestone** level. It should answer what needs to exist, which architecture direction is intended, what first useful milestone proves the direction, and what decisions remain open. It should not try to become a task-by-task implementation playbook; that stricter handoff belongs to `goal-check`, `delivery`, or `factory`.
 
 ## Vocabulary
 
@@ -17,8 +17,8 @@ Goal-forge operates at the **architecture and milestone** level. It should answe
 | --- | --- | --- |
 | **Goal artifact** | `goal-forge` | Single focused document (`GOAL.md`, etc.) defining one problem boundary and desired end state. |
 | **Campaign artifact** | `campaign` | Multi-track routing document coordinating several goals, bugs, features, or cleanup families. |
-| **Delivery spec** | `delivery` | Repo-aware plan for one delivery-sized unit. Lower from goal or campaign — not produced here. |
-| **Factory phase** | `factory` | Execution cycle for one delivery-sized unit. |
+| **Delivery spec** | `delivery` | Repo-aware plan for one phase (one coherent outcome). Lower from goal or campaign — not produced here. |
+| **Factory phase** | `factory` | Execution cycle for one phase: a group of slices whose phase gate is evaluated together. |
 
 **Rule:** Goal-forge forges **one goal**. Campaign maps **many tracks**. Delivery compiles **units** into **specs**. Factory executes **phases**.
 
@@ -51,11 +51,12 @@ Factory [`vision`](../factory/references/vision.md) validates goal readiness at 
 ## Core Rules
 
 - Do not implement code, migrations, UI, scripts, docs, or product changes — except writing or updating the goal artifact.
+- The goal artifact is a plan artifact: commit it when written or approved as `docs(plan): <name>`, following the user's commit unit (see factory [Commits](../factory/SKILL.md#commits)).
 - Do not create a harness-native goal or task object (if your tool has one) unless the user explicitly asks for one.
 - When the user asks for `GOAL.md`, handoff, or PRD goal section, write the artifact — not a harness-native goal.
 - Do not generate the final goal document until the problem shape is locked or the user explicitly asks for a rough draft.
 - Treat conversation as intent, not ground truth. Verify against files, code, data, logs, docs, screenshots, transcripts, PRs, or explicit user statements.
-- Target detail level: nail down the desired architecture, key invariants, rough implementation shape, and first useful milestone. Leave file-by-file sequencing, exact edits, and mechanical task order to `goal-check`, `delivery`, or `factory` unless the user explicitly wants them in the goal.
+- Target detail level: nail down the desired architecture, key invariants, rough implementation shape, and first useful milestone. Write a First Implementation Path for the first milestone only: the modules, files, or services where the first edit happens, enough for an implementer to start. Leave full file-by-file sequencing, exact edits, and mechanical task order to `delivery` and `slicer` unless the user explicitly wants them in the goal.
 - Ask when the answer is a preference, authorization decision, or material ambiguity that cannot be discovered locally.
 - Ask one question at a time unless a small related batch is clearly better.
 - Stay on the current branch unless the user asks for a new one.
@@ -89,7 +90,7 @@ Accept: raw idea; feeling the goal is not yet definable; existing `GOAL.md`, PRD
 
 - User provides a path → inspect before overwriting.
 - User references an existing goal → update in place unless they ask for a separate draft.
-- No path → `GOAL.md` or `goal.md` at the nearest relevant project root per repo convention.
+- No path → `GOAL.md` at the repo root or the repo's docs directory, per repo convention. Record the path used.
 - Multiple plausible roots → inspect layout; choose the most local root for the work.
 - Full goal in chat only when the user asks for inline draft or filesystem writes are blocked.
 
@@ -105,12 +106,12 @@ If still exploring, stay conversational. Do not force the artifact early.
 
 ### 2. Evidence Gathering
 
-Research before asking for discoverable facts. Cover:
+Research before asking for discoverable facts. Use a dedicated skill or tool for each item when you have one; when an evidence source is unavailable, record the substitution you used instead. Cover:
 
 - orientation: read the repo layout, conventions, and validation paths before asking the user anything discoverable
 - simplification: first-principles check of whether the requested solution is the simplest one
 - gap analysis: the milestone versus the current implementation
-- bug or regression starting point: a root-cause pass, when the goal is a fix
+- bug or regression starting point: reproduce and trace the failure read-only to find its cause, when the goal is a fix
 - stale docs or PRDs: verify their claims against live code before trusting them
 - blast radius: run `consequences` for API, schema, migration, security
 
@@ -144,9 +145,9 @@ If multiple independent tracks emerge, note whether `campaign` is the better nex
 
 Write only after problem lock and pressure test are complete enough. Use [references/goal-template.md](references/goal-template.md).
 
-Required sections: `Summary`; `Problem`; `Goals`; `Non-goals`; `Ground truth researched`; `Reference packet`; `Constraints and invariants`; `Architecture direction`; `Supporting skills`; `Implementation shape` (rough first milestone or slices — not a delivery plan); `Release posture` when user-visible or package-facing work is likely; `Exit strategy` when relevant; `Acceptance criteria`; `Validation`; `Open questions`; `Stop conditions`.
+Required sections: `Summary`; `Problem`; `Goals`; `Non-goals`; `Ground truth researched`; `Reference packet`; `Constraints and invariants`; `Architecture direction`; `Supporting skills`; `Implementation shape` (milestones in rough order — not a delivery plan); `First implementation path` (first milestone only: where the first edit happens); `Release posture` when user-visible or package-facing work is likely; `Exit strategy` when relevant; `Acceptance criteria`; `Validation`; `Open questions`; `Stop conditions`; `Status` (starts as `not started`; goal-check, factory, and campaign update it with verdicts and evidence).
 
-Do not lower into epics, workstreams, merge waves, file-by-file task lists, or delivery specs — that belongs to `delivery` or a stricter `goal-check` handoff.
+Do not lower into epics, workstreams, merge waves, full file-by-file task lists, or delivery specs — that belongs to `delivery` and `slicer`. `goal-check` only verifies that the goal is ready for that step; it does not write it.
 
 **Exit:** a future agent understands problem, intended architecture, boundaries, first milestone, evidence, and stop conditions without hidden chat context.
 
@@ -154,7 +155,7 @@ Do not lower into epics, workstreams, merge waves, file-by-file task lists, or d
 
 Run a completion check against the user request, problem lock, evidence, and draft.
 
-Use [$goal-check](../goal-check/SKILL.md) when available — especially for second-opinion review after drafting. Use [`poker-face`](../poker-face/SKILL.md) adapted to the goal document only when a broader promise-versus-artifact audit is needed.
+Use [goal-check](../goal-check/SKILL.md) when available — especially for second-opinion review after drafting. If it returns NOT READY, fill the gaps it lists (here or with the user), then run it again; goal-check records its verdict in the goal's `Status` section but never edits the goal's other sections. Use [`poker-face`](../poker-face/SKILL.md) adapted to the goal document only when a broader promise-versus-artifact audit is needed.
 
 Do not report completion on a goal with material readiness gaps. Revise or record blockers explicitly.
 
@@ -162,7 +163,7 @@ Report one of:
 
 | Label | Meaning |
 | --- | --- |
-| **Ready for factory** | Grounded goal boundary; factory `vision` can admit roadmap/slice/milestone into [production](../factory/references/production.md) |
+| **Ready for factory** | Grounded goal boundary; factory `vision` can admit the roadmap or milestone into [production](../factory/references/production.md) |
 | **Ready for delivery** | One stable unit can lower into a delivery spec |
 | **Ready for campaign** | Goal is clear but work should route through a multi-track map first |
 | **Ready for direct implementation** | Small enough that architecture and rough path are sufficient without delivery planning |

@@ -9,7 +9,7 @@ Pre-implementation readiness check for an **existing goal artifact**. Decide whe
 
 Optional skill. Not a completion gate for work that has already landed — that is [`poker-face`](../poker-face/SKILL.md).
 
-Goal-check uses a stricter handoff bar than goal-forge. A goal that only captures the desired architecture and rough implementation direction may be good goal-forge output, but it is not automatically ready for implementation. Goal-check should shape or reject the document until it is deliverable to a competent implementer who was not in the conversation, with limited room for architectural guessing.
+Goal-check uses a stricter handoff bar than goal-forge. A goal that only captures the desired architecture and rough implementation direction may be good goal-forge output, but it is not automatically ready for implementation. Goal-check judges the document against that bar and names every gap that keeps it from being deliverable to a competent implementer who was not in the conversation. It does not edit the goal's content: `NOT READY` lists the exact gaps, `goal-forge` (or the user) fills them, and goal-check runs again. It only records its verdict (see [Record The Verdict](#4-record-the-verdict)).
 
 ## Primary Use Cases
 
@@ -38,17 +38,17 @@ For second opinion: treat the goal document as source of truth. The drafter's ch
 | `READY` + consumer is `delivery` | Lower one stable unit into a delivery spec |
 | `READY` + consumer is direct implementation | Begin scoped implementation |
 | `READY` + consumer is `campaign` | User may need multi-track map before lowering |
-| `NOT READY` | Return to `goal-forge` or revise artifact with named gaps |
+| `NOT READY` | List the exact gaps. `goal-forge` (or the user) fills them, then run goal-check again; goal-check does not edit the goal's other sections |
 | `NEEDS FURTHER REVIEW` | Escalate; do not bluff readiness |
 
 | From | To | When |
 | --- | --- | --- |
 | `goal-forge` | `goal-check` | Goal drafted; readiness or second opinion needed |
 | User | `goal-check` | Picking up stale goal doc; verifying before resuming work |
-| `goal-check` | `goal-forge` | Gaps require discovery conversation, not just edits |
+| `goal-check` | `goal-forge` | `NOT READY`: the listed gaps need a discovery conversation or an edit to the goal |
 | `goal-check` | `campaign` | Review reveals multiple tracks needing coordination |
 
-Do not use goal-check to: invent product scope; write goals from scratch; execute; replace post-implementation review. It may require implementation-path detail inside the goal document when that detail is necessary for an unambiguous handoff.
+Do not use goal-check to: invent product scope; write or edit goals (beyond recording its verdict); execute; replace post-implementation review. It may require implementation-path detail inside the goal document (the `First Implementation Path` section, for the first milestone) when that detail is necessary for an unambiguous handoff, and it reports the absence as a gap rather than writing it.
 
 ## When To Use
 
@@ -75,7 +75,7 @@ Time-box the review. Decide whether the goal is usable as an implementation hand
 - Focus on clarity, grounding, architecture decisions, implementation path, boundaries, acceptance criteria, validation, constraints, stop conditions.
 - Supporting docs are evidence, not an invitation to redesign the goal.
 - Do not require line-by-line edits, final code shapes, or exhaustive mechanical steps.
-- Do require all material architecture decisions: canonical ownership, data/control flow, schema or API shape when relevant, integration boundaries, migration posture, compatibility stance, and the first implementation path through concrete files/modules/services when discoverable.
+- Do require all material architecture decisions: canonical ownership, data/control flow, schema or API shape when relevant, integration boundaries, migration posture, compatibility stance, and the first milestone's implementation path through concrete files/modules/services when discoverable.
 - Design choices may defer to `delivery` or `factory` only when the deferral is explicit, non-material to the starting architecture, and does not force the implementing model to choose between incompatible approaches.
 - Do not pass a goal requiring guesswork on end state, architecture, success conditions, permissions, data shape, implementation order, or excluded scope.
 - Do not fail a goal for non-material details deliberately deferred to delivery planning.
@@ -142,7 +142,7 @@ Prefer concrete blockers over broad improvement notes.
 - blocking open questions not called out
 - for stale pickup: goal contradicts current repo reality on material points
 
-Be specific. Name the gap to fix before implementation begins.
+Be specific. Name each gap to fix before implementation begins; do not fix it yourself.
 
 **`NEEDS FURTHER REVIEW`** when:
 
@@ -153,6 +153,10 @@ Be specific. Name the gap to fix before implementation begins.
 
 Uncertainty escalates; do not bluff.
 
+### 4. Record The Verdict
+
+Write the verdict, evaluator mode, date, and any blocking gaps into the goal's `## Status` section, or into the run's ledger when one exists (see factory [Ledger File](../factory/references/loop.md#ledger-file)). This is the only edit goal-check makes, and it never touches the goal's other sections. The Status edit is bookkeeping; commit it under the user's commit unit (see factory [Commits](../factory/SKILL.md#commits)).
+
 ## Output Format
 
 1. **Goal Check Summary** — artifact reviewed; evaluator mode (independent / cold self-pass); intended next consumer; handoff bar used; verdict
@@ -160,7 +164,8 @@ Uncertainty escalates; do not bluff.
 3. **Key Points** — flat bullets for main readiness findings, including architecture and implementation-path clarity
 4. **Blocking Gaps** — only when `NOT READY`
 5. **Escalation Reason** — only when `NEEDS FURTHER REVIEW`
-6. **Recommended next step** — `factory`, `delivery`, `campaign`, `goal-forge`, or direct implementation
+6. **Recorded in** — the goal's `Status` section or the ledger, with the path
+7. **Recommended next step** — `factory`, `delivery`, `campaign`, `goal-forge` (fill the gaps, then re-run goal-check), or direct implementation
 
 ## Language To Use
 
