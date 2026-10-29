@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codebase Housekeeping"
+  short_description: "Run a full project maintenance cycle"
+  default_prompt: "Use $housekeeping to run a full maintenance cycle on this repository."

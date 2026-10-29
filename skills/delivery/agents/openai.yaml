@@ -1,0 +1,4 @@
+interface:
+  display_name: "Delivery"
+  short_description: "Compile one bounded outcome into an implementation-ready plan"
+  default_prompt: "Use $delivery for planning only. Ground one coherent outcome in the live repo and save a specification with logical-change units, dependencies, write scopes, validation, and gates."

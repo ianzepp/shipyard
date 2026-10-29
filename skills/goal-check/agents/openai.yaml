@@ -1,0 +1,4 @@
+interface:
+  display_name: "Goal Check"
+  short_description: "Verify whether a goal is ready for implementation"
+  default_prompt: "Use $goal-check to review this goal document or document packet for implementation readiness, then return READY, NOT READY, or NEEDS FURTHER REVIEW."

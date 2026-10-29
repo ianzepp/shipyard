@@ -1,0 +1,4 @@
+interface:
+  display_name: "Red Green"
+  short_description: "Agentic red-green coverage loop"
+  default_prompt: "Use $red-green to expand unit coverage, audit testability seams, and loop on real failures until the test surface is honest."

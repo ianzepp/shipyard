@@ -1,0 +1,4 @@
+interface:
+  display_name: "Correctness"
+  short_description: "Hunt behavioral bugs and invariant breaks"
+  default_prompt: "Use $correctness to hunt for real behavioral bugs, invariant breaks, races, and data-loss risks in this code, and fix or report them by severity."

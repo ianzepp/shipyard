@@ -1,0 +1,11 @@
+{
+  "name": "shipyard",
+  "owner": { "name": "Ian Zepp" },
+  "plugins": [
+    {
+      "name": "shipyard",
+      "source": "./",
+      "description": "Engineering pipeline skills from idea to verified commits."
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auditor"
+  short_description: "Rigorous code and integration audits"
+  default_prompt: "Use $auditor to audit the given change, account for the full review surface, validate by risk, and return a calibrated verdict with evidence."

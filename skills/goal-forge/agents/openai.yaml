@@ -1,0 +1,4 @@
+interface:
+  display_name: "Goal Forge"
+  short_description: "Forge problem intent into goal documents"
+  default_prompt: "Use $goal-forge to talk through the real problem, gather evidence, lock the problem shape, and only then produce an agent-ready GOAL.md-style document with constraints, non-goals, first milestone, validation, stop conditions, and handoff readiness."

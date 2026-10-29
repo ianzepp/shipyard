@@ -1,0 +1,4 @@
+interface:
+  display_name: "Consequences"
+  short_description: "Trace forward blast radius before a change lands"
+  default_prompt: "Use $consequences to read-only trace what this proposal, PR, or plan will affect downstream and what follow-on work is required."

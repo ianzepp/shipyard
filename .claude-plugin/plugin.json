@@ -1,0 +1,10 @@
+{
+  "name": "shipyard",
+  "description": "Engineering pipeline skills: take an idea or an unscoped feature through goals, campaigns, delivery specs, slices, implementation, audit, and polish until it ships as verified commits.",
+  "version": "0.1.0",
+  "author": { "name": "Ian Zepp" },
+  "homepage": "https://github.com/ianzepp/shipyard",
+  "repository": "https://github.com/ianzepp/shipyard",
+  "license": "MIT",
+  "keywords": ["skills", "planning", "delivery", "code-review", "engineering-process"]
+}

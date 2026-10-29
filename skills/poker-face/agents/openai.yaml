@@ -1,0 +1,4 @@
+interface:
+  display_name: "Poker Face"
+  short_description: "Cold-audit completed work against the original plan"
+  default_prompt: "Use $poker-face to run a cold post-implementation completion audit: reread the original plan or requirement, reconstruct the requirement checklist, map each item to actual implementation evidence, identify high/medium/low misses, and return to implementation if material work was missed."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Big Bang"
+  short_description: "Explore possible futures through recursive research, analysis, pressure tests, artifacts, and handoffs"
+  default_prompt: "Use $big-bang to take this rough idea through planning, research, analysis, branch pressure-tests, provisional branch choices, recursive artifact loops, and handoff preparation. Do not stop at branch points by default; choose the best one or two branches to explore unless the user must decide. Do not generate code or scaffold a project while in Big Bang, even for software ideas; hand off to $goal-forge, $delivery, or $factory when implementation planning or execution is the next step."

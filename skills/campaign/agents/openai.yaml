@@ -1,0 +1,4 @@
+interface:
+  display_name: "Campaign"
+  short_description: "Plan or run multi-workstream delivery campaigns"
+  default_prompt: "Use $campaign to draft or run one multi-track completion contract. Verify live state, preserve every admitted item, and lower the next eligible stage through delivery or factory."

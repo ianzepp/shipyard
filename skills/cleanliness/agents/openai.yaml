@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cleanliness"
+  short_description: "Manage code shape and complexity"
+  default_prompt: "Use $cleanliness to review this implementation for managed complexity before commit."
